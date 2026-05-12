@@ -1,4 +1,4 @@
-# Ethnos Pokémon <img width="512" height="512" alt="image" src="https://github.com/user-attachments/assets/fe81174c-dce9-4182-90d4-bd1451f65b78" />
+# Ethnos Pokémon 🔴
 
 
 Demo jogável de um jogo de cartas baseado no Ethnos, com temática Pokémon. Desenvolvido como trabalho da disciplina de Gerência de Projetos e Manutenção de Software.
