@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ethnos Pokémon — Demo (GPMS)</title>
+  <style>
+    :root{
+      --bg:#060616;
+      --panel:#0c0c22;
+      --panel2:#10102e;
+      --text:#e9e9f5;
+      --muted:#9a9ab7;
+      --gold:#d4af37;
+      --yellow:#ffd60a;
+      --red:#e63946;
+      --blue:#48cae4;
+      --green:#52b788;
+      --border:#ffffff18;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;background:radial-gradient(ellipse at 70% 20%, #1a0040 0%, var(--bg) 70%);color:var(--text)}
+    header{padding:18px 16px;border-bottom:1px solid var(--border);background:linear-gradient(180deg, #050510, transparent)}
+    h1{margin:0;font-size:18px;letter-spacing:.5px}
+    .sub{color:var(--muted);font-size:12px;margin-top:6px;line-height:1.45}
+    main{padding:16px;max-width:1200px;margin:0 auto}
+    .grid{display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start}
+    .grid.started{grid-template-columns:1fr}
+    @media (max-width: 980px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(135deg, var(--panel2), var(--panel));border:1px solid var(--border);border-radius:14px;padding:14px}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .pill{border:1px solid var(--border);background:#ffffff08;border-radius:999px;padding:6px 10px;font-size:12px;color:var(--muted)}
+    .btn{cursor:pointer;border:1px solid #ffd60a66;background:linear-gradient(135deg, #ffd60a, #e63946);color:#100b00;border-radius:10px;padding:10px 12px;font-weight:800;font-size:12px;letter-spacing:.3px}
+    .btn.secondary{background:#ffffff08;color:var(--text);border-color:var(--border);font-weight:700}
+    .btn.danger{background:#ffffff08;color:var(--red);border-color:#e6394638}
+    .btn:disabled{opacity:.45;cursor:not-allowed}
+    label{font-size:12px;color:var(--muted)}
+    input,select{width:100%;margin-top:6px;background:#050515;border:1px solid var(--border);border-radius:10px;color:var(--text);padding:10px}
+    .board{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    @media (max-width: 760px){.board{grid-template-columns:1fr 1fr}}
+    .region{border:1px solid var(--border);border-radius:14px;padding:12px;background:#050518}
+    .region h3{margin:0 0 6px 0;font-size:13px}
+    .meta{font-size:11px;color:var(--muted);line-height:1.4}
+    .influence{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
+    .token{font-size:12px;border:1px solid var(--border);border-radius:10px;padding:6px 8px;background:#ffffff08}
+    .token.p1{border-color:#ffd60a55}
+    .token.p2{border-color:#48cae455}
+    .hand{display:flex;gap:10px;flex-wrap:wrap}
+    .poke{width:150px;border:1px solid var(--border);border-radius:14px;padding:10px;background:linear-gradient(145deg,#1e3a5f,#0f1f38);cursor:pointer;user-select:none}
+    .poke.selected{outline:2px solid var(--yellow)}
+    .poke .art{width:100%;height:86px;border-radius:10px;background:#ffffff08;border:1px solid #ffffff12;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-top:8px}
+    .poke .art img{width:100%;height:100%;object-fit:contain;image-rendering:auto}
+    .poke .top{display:flex;justify-content:space-between;align-items:center}
+    .poke .emoji{font-size:22px}
+    .poke .name{font-weight:800;font-size:12px;color:var(--gold);margin-top:6px}
+    .poke .line{font-size:11px;color:var(--muted);margin-top:3px}
+    .tag{display:inline-block;margin-top:7px;font-size:10px;border:1px solid var(--border);border-radius:999px;padding:3px 7px;color:var(--muted)}
+    .tag.evo{border-color:#e6394660;color:var(--red)}
+    .tag.legend{border-color:#ffd60a70;color:var(--yellow)}
+    .log{max-height:210px;overflow:auto;background:#050510;border:1px solid var(--border);border-radius:12px;padding:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:11px;color:#cfcfe6}
+    .hr{height:1px;background:#ffffff10;margin:12px 0}
+    .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    @media (max-width: 980px){.kpi{grid-template-columns:repeat(2,1fr)}}
+    .kpi .box{border:1px solid var(--border);border-radius:14px;padding:10px;background:#ffffff06}
+    .kpi .v{font-weight:900;font-size:16px}
+    .kpi .l{font-size:11px;color:var(--muted);margin-top:4px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ethnos Pokémon — Demo (vertical slice)</h1>
+    <div class="sub">
+      Objetivo da demo: mostrar fluxo hotseat (2–4), comprar carta, formar bando por <b>Tipo</b> ou <b>Região</b>, escolher <b>Líder</b> e aplicar influência por região.
+      <br/>Escopo intencionalmente reduzido para ser uma “versão parcial” apresentável na 1ª rodada.
+    </div>
+  </header>
+  <main>
+    <div class="grid" id="gridRoot">
+      <section class="card" id="setupCard">
+        <div class="row" style="justify-content:space-between">
+          <div>
+            <div style="font-weight:900;color:var(--yellow);letter-spacing:.6px">Configuração</div>
+            <div class="sub">2 a 4 jogadores · Local (hotseat)</div>
+          </div>
+          <button class="btn secondary" id="resetBtn" title="Limpa o estado e reinicia">Reset</button>
+        </div>
+        <div class="hr"></div>
+        <label>Número de jogadores</label>
+        <select id="playerCount">
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
+        <div class="hr"></div>
+        <div id="nameInputs"></div>
+        <div class="hr"></div>
+        <button class="btn" id="startBtn">Iniciar partida</button>
+        <div class="hr"></div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.5">
+          <b>Regras simplificadas desta demo</b>
+          <ul style="margin:8px 0 0 18px;padding:0">
+            <li>Sem Eras completas e sem pontuação final (isso entra na próxima entrega).</li>
+            <li>Jogar bando: selecione 2+ cartas e escolha 1 líder (topo). O bando deve ser de mesmo Tipo ou mesma Região.</li>
+            <li>Influência: o líder define a Região alvo; ganha-se influência igual ao estágio (Base=1, Evo=2, Lendário=3).</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="card" id="gameCard" style="display:none">
+        <div class="row" style="justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="row">
+              <span class="pill" id="turnPill">Vez de: —</span>
+              <span class="pill" id="deckPill">Deck: —</span>
+            </div>
+            <div class="sub" id="phaseNote">Selecione cartas para formar um bando, ou compre 1 carta.</div>
+          </div>
+          <div class="row">
+            <button class="btn secondary" id="drawBtn">Comprar carta</button>
+            <button class="btn" id="playBandBtn" disabled>Jogar bando</button>
+            <button class="btn danger" id="endTurnBtn">Passar turno</button>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <div class="kpi">
+          <div class="box"><div class="v" id="kpiHand">0</div><div class="l">Cartas na mão</div></div>
+          <div class="box"><div class="v" id="kpiSel">0</div><div class="l">Selecionadas p/ bando</div></div>
+          <div class="box"><div class="v" id="kpiTypes">—</div><div class="l">Tipo(s) selecionado(s)</div></div>
+          <div class="box"><div class="v" id="kpiRegions">—</div><div class="l">Região(ões) selecionada(s)</div></div>
+        </div>
+
+        <div class="hr"></div>
+        <div style="font-weight:900;color:var(--yellow);margin-bottom:10px">Tabuleiro (6 regiões)</div>
+        <div class="board" id="board"></div>
+
+        <div class="hr"></div>
+        <div style="font-weight:900;color:var(--yellow);margin-bottom:10px">Mão do jogador (clique para selecionar)</div>
+        <div class="hand" id="hand"></div>
+
+        <div class="hr"></div>
+        <div style="font-weight:900;color:var(--yellow);margin-bottom:10px">Log</div>
+        <div class="log" id="log"></div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    /** Data model (minimal) **/
+    const TYPES = [
+      { id:"Fogo", emoji:"🔥" },
+      { id:"Água", emoji:"💧" },
+      { id:"Planta", emoji:"🌿" },
+      { id:"Elétrico", emoji:"⚡" },
+      { id:"Sombrio", emoji:"🌑" },
+      { id:"Dragão", emoji:"🐉" },
+      { id:"Fantasma", emoji:"👻" },
+      { id:"Aço", emoji:"⚙️" },
+      { id:"Veneno", emoji:"☠️" },
+      { id:"Lutador", emoji:"👊" },
+      { id:"Psíquico", emoji:"🌀" },
+      { id:"Normal", emoji:"⭐" },
+    ];
+
+    // Para evitar confusão com Pokémon de 2 tipos, a demo usa APENAS Pokémon de 1 tipo.
+    // O pool grande é montado automaticamente via PokeAPI (com cache). Se falhar (offline),
+    // usamos este pool pequeno como fallback.
+    const FALLBACK_POKEMON_POOL = {
+      "Fogo": [
+        { id: 37, name: "Vulpix" },
+        { id: 58, name: "Growlithe" },
+        { id: 155, name: "Cyndaquil" },
+        { id: 324, name: "Torkoal" },
+      ],
+      "Água": [
+        { id: 7, name: "Squirtle" },
+        { id: 54, name: "Psyduck" },
+        { id: 60, name: "Poliwag" },
+        { id: 129, name: "Magikarp" },
+      ],
+      "Planta": [
+        { id: 152, name: "Chikorita" },
+        { id: 252, name: "Treecko" },
+        { id: 387, name: "Turtwig" },
+        { id: 495, name: "Snivy" },
+      ],
+      "Elétrico": [
+        { id: 25, name: "Pikachu" },
+        { id: 100, name: "Voltorb" },
+        { id: 135, name: "Jolteon" },
+        { id: 179, name: "Mareep" },
+      ],
+      "Sombrio": [
+        { id: 261, name: "Poochyena" },
+        { id: 359, name: "Absol" },
+        { id: 570, name: "Zorua" },
+        { id: 509, name: "Purrloin" },
+      ],
+      "Dragão": [
+        { id: 147, name: "Dratini" },
+        { id: 610, name: "Axew" },
+        { id: 782, name: "Jangmo-o" },
+        { id: 996, name: "Frigibax" },
+      ],
+      "Fantasma": [
+        { id: 200, name: "Misdreavus" },
+        { id: 353, name: "Shuppet" },
+        { id: 607, name: "Litwick" },
+        { id: 708, name: "Phantump" },
+      ],
+      "Aço": [
+        { id: 599, name: "Klink" },
+        { id: 878, name: "Cufant" },
+        { id: 597, name: "Ferroseed" },
+        { id: 374, name: "Beldum" },
+      ],
+      "Veneno": [
+        { id: 23, name: "Ekans" },
+        { id: 29, name: "Nidoran♀" },
+        { id: 32, name: "Nidoran♂" },
+        { id: 316, name: "Gulpin" },
+      ],
+      "Lutador": [
+        { id: 56, name: "Mankey" },
+        { id: 66, name: "Machop" },
+        { id: 236, name: "Tyrogue" },
+        { id: 539, name: "Sawk" },
+      ],
+      "Psíquico": [
+        { id: 63, name: "Abra" },
+        { id: 325, name: "Spoink" },
+        { id: 677, name: "Espurr" },
+        { id: 480, name: "Uxie" },
+      ],
+      "Normal": [
+        { id: 133, name: "Eevee" },
+        { id: 216, name: "Teddiursa" },
+        { id: 300, name: "Skitty" },
+        { id: 659, name: "Bunnelby" },
+      ],
+    };
+
+    const TYPE_TO_POKEAPI = {
+      "Fogo": "fire",
+      "Água": "water",
+      "Planta": "grass",
+      "Elétrico": "electric",
+      "Sombrio": "dark",
+      "Dragão": "dragon",
+      "Fantasma": "ghost",
+      "Aço": "steel",
+      "Veneno": "poison",
+      "Lutador": "fighting",
+      "Psíquico": "psychic",
+      "Normal": "normal",
+    };
+
+    // cache version bump: remove cap/starter/mega/gmax variants
+    const POKEAPI_CACHE_KEY = "ethnos_pokemon_pool_v2";
+    const TARGET_DISTINCT_PER_TYPE = 7; // 12 tipos × 7 = 84 distintos (~80 como você pediu)
+
+    function artworkUrl(pokemonId){
+      // Official artwork do PokeAPI (via GitHub raw). Requer internet.
+      return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonId}.png`;
+    }
+
+    async function fetchJson(url){
+      const res = await fetch(url, { cache: "force-cache" });
+      if(!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+      return await res.json();
+    }
+
+    function titleCaseFromSlug(slug){
+      // Keep hyphens that are part of canonical names (e.g. jangmo-o), but remove known variant suffixes.
+      const s = String(slug || "").trim().toLowerCase();
+      if(!s) return "";
+      return s
+        .split("-")
+        .map(part => part ? part[0].toUpperCase() + part.slice(1) : part)
+        .join("-");
+    }
+
+    async function canonicalizePokemonFromTypeEntry(pokemonUrl, expectedTypeName){
+      // Type endpoint may return variant forms like pikachu-original-cap / eevee-starter.
+      // We canonicalize by going from pokemon -> species -> default variety.
+      const p = await fetchJson(pokemonUrl);
+      const types = Array.isArray(p.types) ? p.types.map(x => x?.type?.name).filter(Boolean) : [];
+      if(types.length !== 1) return null; // monotype only
+      if(types[0] !== expectedTypeName) return null;
+
+      const speciesUrl = p?.species?.url;
+      if(!speciesUrl) return null;
+      const species = await fetchJson(speciesUrl);
+      const baseName = (species?.name || "").trim();
+      if(!baseName) return null;
+
+      const varieties = Array.isArray(species?.varieties) ? species.varieties : [];
+      const def = varieties.find(v => v?.is_default)?.pokemon?.url;
+      if(!def) return null;
+
+      const defPokemon = await fetchJson(def);
+      const defId = Number(defPokemon?.id);
+      if(!defId) return null;
+
+      // Re-check monotype on default variety (extra safety)
+      const defTypes = Array.isArray(defPokemon?.types) ? defPokemon.types.map(x => x?.type?.name).filter(Boolean) : [];
+      if(defTypes.length !== 1) return null;
+      if(defTypes[0] !== expectedTypeName) return null;
+
+      return { id: defId, name: titleCaseFromSlug(baseName) };
+    }
+
+    function safeParseJson(s){
+      try { return JSON.parse(s); } catch { return null; }
+    }
+
+    function loadCachedPool(){
+      const raw = localStorage.getItem(POKEAPI_CACHE_KEY);
+      if(!raw) return null;
+      const parsed = safeParseJson(raw);
+      if(!parsed || typeof parsed !== "object") return null;
+      // basic shape check
+      for(const t of TYPES){
+        if(!Array.isArray(parsed[t.id])) return null;
+      }
+      return parsed;
+    }
+
+    function saveCachedPool(pool){
+      try{
+        localStorage.setItem(POKEAPI_CACHE_KEY, JSON.stringify(pool));
+      }catch{
+        // ignore quota errors
+      }
+    }
+
+    async function buildLargePoolViaPokeApi(){
+      const out = {};
+      for(const t of TYPES){
+        out[t.id] = [];
+      }
+
+      for(const t of TYPES){
+        const typeName = TYPE_TO_POKEAPI[t.id];
+        if(!typeName) continue;
+
+        const typeData = await fetchJson(`https://pokeapi.co/api/v2/type/${typeName}`);
+        const candidates = (typeData.pokemon || [])
+          .map(p => p?.pokemon?.url)
+          .filter(Boolean);
+        shuffle(candidates);
+
+        for(const url of candidates){
+          if(out[t.id].length >= TARGET_DISTINCT_PER_TYPE) break;
+          try{
+            const canon = await canonicalizePokemonFromTypeEntry(url, typeName);
+            if(!canon) continue;
+            // dedupe within type
+            if(out[t.id].some(x => x.id === canon.id)) continue;
+            out[t.id].push(canon);
+          }catch{
+            // ignore per-pokemon errors
+          }
+        }
+      }
+
+      // if any type is too small, we still return what we have (deck builder falls back)
+      return out;
+    }
+
+    async function getPokemonPool(){
+      const cached = loadCachedPool();
+      if(cached) return cached;
+      try{
+        const pool = await buildLargePoolViaPokeApi();
+        // ensure shape, but allow empties
+        for(const t of TYPES){
+          if(!Array.isArray(pool[t.id])) pool[t.id] = [];
+        }
+        saveCachedPool(pool);
+        return pool;
+      }catch{
+        return FALLBACK_POKEMON_POOL;
+      }
+    }
+
+    const REGIONS = [
+      { id:"Planície", emoji:"🌿", color:"#52b788" },
+      { id:"Oceano", emoji:"💧", color:"#48cae4" },
+      { id:"Vulcão", emoji:"🔥", color:"#e63946" },
+      { id:"Sombra", emoji:"🌑", color:"#9b5de5" },
+      { id:"Tempestade", emoji:"⚡", color:"#ffd60a" },
+      { id:"Caverna", emoji:"🪨", color:"#c0c0c0" },
+    ];
+
+    const STAGES = [
+      { id:"Base", power:1, tagClass:"" },
+      { id:"Evo", power:2, tagClass:"evo" },
+      { id:"Lendário", power:3, tagClass:"legend" },
+    ];
+
+    function randInt(n){ return Math.floor(Math.random()*n); }
+    function uid(){ return Math.random().toString(16).slice(2) + Date.now().toString(16); }
+    function shuffle(a){
+      for(let i=a.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+      }
+      return a;
+    }
+
+    async function buildDeck(){
+      // Simplificação: 2 cartas por (Tipo x Região) com estágio sorteado (viés para Base)
+      const pokemonPool = await getPokemonPool();
+      const deck = [];
+      for(const t of TYPES){
+        for(const r of REGIONS){
+          for(let k=0;k<2;k++){
+            const roll = Math.random();
+            const stage = roll < 0.70 ? STAGES[0] : roll < 0.93 ? STAGES[1] : STAGES[2];
+            const pool = pokemonPool[t.id] || FALLBACK_POKEMON_POOL[t.id] || [];
+            const pick = pool.length ? pool[randInt(pool.length)] : { id: 0, name: t.id };
+            deck.push({
+              id: uid(),
+              type: t.id,
+              typeEmoji: t.emoji,
+              region: r.id,
+              regionEmoji: r.emoji,
+              pokemonId: pick.id,
+              pokemonName: pick.name,
+              imgUrl: pick.id ? artworkUrl(pick.id) : "",
+              stage: stage.id,
+              power: stage.power
+            });
+          }
+        }
+      }
+      return shuffle(deck);
+    }
+
+    /** App state **/
+    const state = {
+      started: false,
+      players: [],
+      current: 0,
+      actionTakenThisTurn: false,
+      deck: [],
+      hands: [],
+      selectedIds: new Set(),
+      influence: REGIONS.reduce((acc, r) => {
+        acc[r.id] = {}; // playerIndex -> influence
+        return acc;
+      }, {}),
+      log: []
+    };
+
+    /** DOM **/
+    const $ = (id) => document.getElementById(id);
+    const setupCard = $("setupCard");
+    const gameCard = $("gameCard");
+    const gridRoot = $("gridRoot");
+    const nameInputs = $("nameInputs");
+    const playerCount = $("playerCount");
+    const startBtn = $("startBtn");
+    const resetBtn = $("resetBtn");
+    const drawBtn = $("drawBtn");
+    const playBandBtn = $("playBandBtn");
+    const endTurnBtn = $("endTurnBtn");
+    const handEl = $("hand");
+    const boardEl = $("board");
+    const logEl = $("log");
+    const turnPill = $("turnPill");
+    const deckPill = $("deckPill");
+    const kpiHand = $("kpiHand");
+    const kpiSel = $("kpiSel");
+    const kpiTypes = $("kpiTypes");
+    const kpiRegions = $("kpiRegions");
+
+    function pushLog(msg){
+      const line = `${new Date().toLocaleTimeString()}  ${msg}`;
+      state.log.unshift(line);
+      if(state.log.length > 80) state.log.pop();
+      renderLog();
+    }
+
+    function renderNameInputs(){
+      const n = Number(playerCount.value);
+      nameInputs.innerHTML = "";
+      for(let i=0;i<n;i++){
+        const wrap = document.createElement("div");
+        wrap.style.marginBottom = "10px";
+        wrap.innerHTML = `
+          <label>Jogador ${i+1}</label>
+          <input id="pname-${i}" value="Jogador ${i+1}" />
+        `;
+        nameInputs.appendChild(wrap);
+      }
+    }
+
+    function reset(){
+      state.started = false;
+      state.players = [];
+      state.current = 0;
+      state.actionTakenThisTurn = false;
+      state.deck = [];
+      state.hands = [];
+      state.selectedIds = new Set();
+      state.influence = REGIONS.reduce((acc, r) => (acc[r.id] = {}, acc), {});
+      state.log = [];
+      setupCard.style.display = "";
+      gameCard.style.display = "none";
+      gridRoot.classList.remove("started");
+      renderNameInputs();
+    }
+
+    async function startGame(){
+      const n = Number(playerCount.value);
+      state.players = [];
+      for(let i=0;i<n;i++){
+        const v = ($(`pname-${i}`)?.value || `Jogador ${i+1}`).trim();
+        state.players.push(v || `Jogador ${i+1}`);
+      }
+      state.current = 0;
+      state.actionTakenThisTurn = false;
+      startBtn.disabled = true;
+      startBtn.textContent = "Carregando Pokémon...";
+      try{
+        state.deck = await buildDeck();
+      } finally {
+        startBtn.disabled = false;
+        startBtn.textContent = "Iniciar partida";
+      }
+      state.hands = Array.from({length:n}, () => []);
+      state.selectedIds = new Set();
+      state.started = true;
+      state.log = [];
+
+      // compra inicial: 5 cartas
+      for(let i=0;i<n;i++){
+        for(let k=0;k<5;k++){
+          drawCard(i, { silent: true });
+        }
+      }
+      pushLog(`Partida iniciada com ${n} jogador(es). Cada um comprou 5 cartas.`);
+      setupCard.style.display = "none";
+      gameCard.style.display = "";
+      gridRoot.classList.add("started");
+      renderAll();
+    }
+
+    function currentPlayerIndex(){ return state.current; }
+    function currentPlayerName(){ return state.players[state.current]; }
+
+    function drawCard(playerIdx, { silent=false } = {}){
+      if(!silent && playerIdx === currentPlayerIndex() && state.actionTakenThisTurn){
+        pushLog("Ação já realizada neste turno. Passe o turno para continuar.");
+        return null;
+      }
+      if(state.deck.length === 0){
+        if(!silent) pushLog("Deck vazio. (Na versão completa, isso dispara fim de Era.)");
+        return null;
+      }
+      const c = state.deck.pop();
+      state.hands[playerIdx].push(c);
+      if(!silent) {
+        state.actionTakenThisTurn = true;
+        pushLog(`${state.players[playerIdx]} comprou: ${c.typeEmoji} ${c.type} (${c.pokemonName}) · ${c.regionEmoji} ${c.region} · ${c.stage} (+${c.power})`);
+        pushLog("Fim da ação do turno. (Regra Ethnos: 1 ação por turno) → passe o turno.");
+      }
+      return c;
+    }
+
+    function toggleSelect(cardId){
+      if(state.selectedIds.has(cardId)) state.selectedIds.delete(cardId);
+      else state.selectedIds.add(cardId);
+      renderAll();
+    }
+
+    function getSelectedCards(){
+      const hand = state.hands[currentPlayerIndex()];
+      const ids = state.selectedIds;
+      return hand.filter(c => ids.has(c.id));
+    }
+
+    function validBand(selected){
+      if(selected.length < 2) return { ok:false, why:"Selecione 2+ cartas." };
+      const types = new Set(selected.map(c => c.type));
+      const regions = new Set(selected.map(c => c.region));
+      if(types.size === 1) return { ok:true, mode:"type" };
+      if(regions.size === 1) return { ok:true, mode:"region" };
+      return { ok:false, why:"Bando inválido: precisa ser mesmo Tipo OU mesma Região." };
+    }
+
+    async function chooseLeader(selected){
+      const options = selected.map((c, idx) => `${idx+1}) ${c.typeEmoji} ${c.type} (${c.pokemonName}) · ${c.regionEmoji} ${c.region} · ${c.stage} (+${c.power})`).join("\n");
+      const ans = prompt(
+        "Escolha o LÍDER do bando (digite o número):\n\n" + options + "\n\nDica: o líder define a região que receberá influência."
+      );
+      const i = Number(ans);
+      if(!Number.isFinite(i) || i < 1 || i > selected.length) return null;
+      return selected[i-1];
+    }
+
+    async function playBand(){
+      if(state.actionTakenThisTurn){
+        alert("Você já fez 1 ação neste turno. Passe o turno para continuar.");
+        return;
+      }
+      const selected = getSelectedCards();
+      const v = validBand(selected);
+      if(!v.ok){ alert(v.why); return; }
+
+      const leader = await chooseLeader(selected);
+      if(!leader){ alert("Líder não escolhido. Ação cancelada."); return; }
+
+      // aplicar influência na região do líder
+      const p = currentPlayerIndex();
+      const regionId = leader.region;
+      state.influence[regionId][p] = (state.influence[regionId][p] || 0) + leader.power;
+
+      // remover cartas da mão
+      const ids = new Set(selected.map(c => c.id));
+      state.hands[p] = state.hands[p].filter(c => !ids.has(c.id));
+      state.selectedIds = new Set();
+
+      pushLog(`${currentPlayerName()} jogou um bando (${v.mode === "type" ? "mesmo Tipo" : "mesma Região"}) com ${selected.length} carta(s). Líder: ${leader.typeEmoji} ${leader.type} (${leader.pokemonName}) em ${leader.regionEmoji} ${leader.region} (+${leader.power} influência).`);
+      state.actionTakenThisTurn = true;
+      pushLog("Fim da ação do turno. (Regra Ethnos: 1 ação por turno) → passe o turno.");
+      renderAll();
+    }
+
+    function endTurn(){
+      state.selectedIds = new Set();
+      state.actionTakenThisTurn = false;
+      state.current = (state.current + 1) % state.players.length;
+      pushLog(`Turno passado. Agora é a vez de ${currentPlayerName()}.`);
+      renderAll();
+    }
+
+    function regionLeader(regionId){
+      const map = state.influence[regionId];
+      let best = null;
+      for(const [pStr, val] of Object.entries(map)){
+        const p = Number(pStr);
+        const v = Number(val);
+        if(!best || v > best.v) best = { p, v };
+        else if(v === best.v) best = { p: -1, v }; // empate
+      }
+      return best;
+    }
+
+    function renderBoard(){
+      boardEl.innerHTML = "";
+      for(const r of REGIONS){
+        const el = document.createElement("div");
+        el.className = "region";
+        const lead = regionLeader(r.id);
+        const leadTxt = !lead ? "Sem controle" : lead.p === -1 ? "Empate" : `${state.players[lead.p]} (${lead.v})`;
+        el.innerHTML = `
+          <h3><span style="color:${r.color}">${r.emoji} ${r.id}</span></h3>
+          <div class="meta">Controle: <b style="color:var(--yellow)">${leadTxt}</b></div>
+          <div class="meta">Influência por jogador:</div>
+          <div class="influence" id="inf-${r.id}"></div>
+        `;
+        boardEl.appendChild(el);
+        const inf = el.querySelector(`#inf-${CSS.escape(r.id)}`);
+        for(let p=0;p<state.players.length;p++){
+          const v = state.influence[r.id][p] || 0;
+          const tok = document.createElement("div");
+          tok.className = "token " + (p===0 ? "p1" : p===1 ? "p2" : "");
+          tok.textContent = `${state.players[p]}: ${v}`;
+          inf.appendChild(tok);
+        }
+      }
+    }
+
+    function renderHand(){
+      handEl.innerHTML = "";
+      const hand = state.hands[currentPlayerIndex()];
+      const selected = state.selectedIds;
+      for(const c of hand){
+        const el = document.createElement("div");
+        el.className = "poke" + (selected.has(c.id) ? " selected" : "");
+        const stageClass = c.stage === "Evo" ? "evo" : c.stage === "Lendário" ? "legend" : "";
+        el.innerHTML = `
+          <div class="top">
+            <div class="emoji">${c.typeEmoji}</div>
+            <div style="font-size:11px;color:var(--muted)">${c.regionEmoji}</div>
+          </div>
+          <div class="art">
+            ${c.imgUrl ? `<img alt="${c.pokemonName}" src="${c.imgUrl}" loading="lazy" onerror="this.remove();">` : `<div style="color:var(--muted);font-size:12px">sem imagem</div>`}
+          </div>
+          <div class="name">${c.pokemonName}</div>
+          <div class="line">${c.type} · ${c.region} · ${c.stage} (+${c.power})</div>
+          <div class="tag ${stageClass}">${c.stage}</div>
+        `;
+        el.addEventListener("click", () => toggleSelect(c.id));
+        handEl.appendChild(el);
+      }
+    }
+
+    function renderKPIs(){
+      const hand = state.hands[currentPlayerIndex()];
+      const selected = getSelectedCards();
+      const typeSet = new Set(selected.map(c => c.type));
+      const regionSet = new Set(selected.map(c => c.region));
+      kpiHand.textContent = String(hand.length);
+      kpiSel.textContent = String(selected.length);
+      kpiTypes.textContent = selected.length ? Array.from(typeSet).join(", ") : "—";
+      kpiRegions.textContent = selected.length ? Array.from(regionSet).join(", ") : "—";
+    }
+
+    function renderTop(){
+      turnPill.textContent = `Vez de: ${currentPlayerName()}`;
+      deckPill.textContent = `Deck: ${state.deck.length} cartas`;
+      const selected = getSelectedCards();
+      const v = validBand(selected);
+      playBandBtn.disabled = !v.ok || state.actionTakenThisTurn;
+      drawBtn.disabled = state.deck.length === 0 || state.actionTakenThisTurn;
+    }
+
+    function renderLog(){
+      logEl.textContent = state.log.join("\n");
+    }
+
+    function renderAll(){
+      if(!state.started) return;
+      renderTop();
+      renderKPIs();
+      renderBoard();
+      renderHand();
+    }
+
+    /** Events **/
+    playerCount.addEventListener("change", renderNameInputs);
+    startBtn.addEventListener("click", startGame);
+    resetBtn.addEventListener("click", reset);
+    drawBtn.addEventListener("click", () => { drawCard(currentPlayerIndex()); renderAll(); });
+    playBandBtn.addEventListener("click", playBand);
+    endTurnBtn.addEventListener("click", endTurn);
+
+    renderNameInputs();
+    reset();
+  </script>
+</body>
+</html>
+
