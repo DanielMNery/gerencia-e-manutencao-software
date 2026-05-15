@@ -23,6 +23,7 @@
   --purple:#9b6fd4;
   --yellow:#f5c842;
   --orange:#e07840;
+  --bot:#ff8c42;
 
   --r-planicie:#52c47a;
   --r-oceano:#4db8d4;
@@ -45,13 +46,10 @@ body{
     radial-gradient(ellipse 80% 50% at 20% 10%, #1a0a3a55 0%, transparent 60%),
     radial-gradient(ellipse 60% 40% at 80% 80%, #0a1a3a44 0%, transparent 60%);
 }
-
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#ffffff18;border-radius:99px}
 
-/* ── LAYOUT ── */
 #app{display:flex;flex-direction:column;min-height:100vh}
 header{
   padding:14px 20px;
@@ -64,7 +62,6 @@ header{
 .logo span{color:var(--muted);font-size:13px;font-family:var(--font-body);margin-left:8px;font-weight:400}
 main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
 
-/* ── SCREENS ── */
 .screen{display:none}
 .screen.active{display:block}
 
@@ -88,6 +85,17 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
 .form-group input:focus,.form-group select:focus{border-color:var(--gold);}
 #player-name-inputs{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .hr{height:1px;background:var(--border);margin:18px 0}
+.player-row{display:flex;gap:8px;align-items:center}
+.player-row input{flex:1}
+.bot-toggle{
+  display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:11px;color:var(--muted);white-space:nowrap;
+  padding:4px 8px;border:1px solid var(--border2);border-radius:8px;
+  transition:all .2s;user-select:none;
+}
+.bot-toggle:hover{border-color:var(--bot);color:var(--bot)}
+.bot-toggle.is-bot{border-color:var(--bot);color:var(--bot);background:#ff8c4218}
+.bot-toggle input{display:none}
 
 /* ── BUTTONS ── */
 .btn{
@@ -95,10 +103,7 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
   font-family:var(--font-title);font-size:12px;letter-spacing:.5px;
   transition:all .15s;display:inline-flex;align-items:center;gap:6px;
 }
-.btn-primary{
-  background:linear-gradient(135deg,#c9a84c,#e07840);
-  color:#100a00;font-weight:700;
-}
+.btn-primary{background:linear-gradient(135deg,#c9a84c,#e07840);color:#100a00;font-weight:700;}
 .btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .btn-primary:active{transform:translateY(0)}
 .btn-secondary{background:var(--panel2);color:var(--text);border:1px solid var(--border2)}
@@ -109,89 +114,49 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;filter:none!important}
 
 /* ── GAME LAYOUT ── */
-#screen-game{
-  display:none;
-  grid-template-columns:260px 1fr;
-  grid-template-rows:auto 1fr;
-  gap:12px;
-  min-height:calc(100vh - 60px);
-}
+#screen-game{display:none;grid-template-columns:260px 1fr;grid-template-rows:auto 1fr;gap:12px;min-height:calc(100vh - 60px)}
 #screen-game.active{display:grid}
-@media(max-width:900px){
-  #screen-game.active{grid-template-columns:1fr;grid-template-rows:auto}
-}
+@media(max-width:900px){#screen-game.active{grid-template-columns:1fr;grid-template-rows:auto}}
 
-/* ── SIDE PANEL ── */
 #side-panel{display:flex;flex-direction:column;gap:10px}
-.panel-card{
-  background:linear-gradient(145deg,var(--panel2),var(--panel));
-  border:1px solid var(--border);border-radius:14px;padding:13px;
-}
+.panel-card{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--border);border-radius:14px;padding:13px;}
 .panel-title{font-family:var(--font-title);font-size:11px;letter-spacing:1px;color:var(--gold);margin-bottom:10px;text-transform:uppercase}
 
-/* ── GLORY TRACK ── */
 .player-score-row{
   display:flex;align-items:center;justify-content:space-between;
   padding:7px 9px;border-radius:9px;margin-bottom:5px;
-  background:#ffffff06;border:1px solid var(--border);
-  transition:background .2s;
+  background:#ffffff06;border:1px solid var(--border);transition:background .2s;
 }
 .player-score-row.current-player{background:#c9a84c18;border-color:#c9a84c44}
 .player-score-row .pname{font-weight:600;font-size:13px}
 .player-score-row .pscore{font-family:var(--font-title);font-size:16px;color:var(--gold2)}
 .player-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 
-/* ── ERA STATUS ── */
-.era-indicator{
-  display:flex;gap:6px;justify-content:center;margin-bottom:8px;
-}
-.era-dot{
-  width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--font-title);font-size:11px;color:var(--muted);
-  transition:all .3s;
-}
+.era-indicator{display:flex;gap:6px;justify-content:center;margin-bottom:8px;}
+.era-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-title);font-size:11px;color:var(--muted);transition:all .3s;}
 .era-dot.active{border-color:var(--gold);color:var(--gold);background:#c9a84c18}
 .era-dot.done{border-color:#52c47a55;color:var(--green);background:#52c47a18}
 
 .dragon-track{display:flex;gap:6px;justify-content:center;margin-top:6px}
-.dragon-pip{
-  width:22px;height:22px;border-radius:50%;border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;font-size:12px;
-  transition:all .3s;
-}
+.dragon-pip{width:22px;height:22px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .3s;}
 .dragon-pip.revealed{border-color:#d94f5c88;background:#d94f5c22;box-shadow:0 0 8px #d94f5c44}
 
-/* ── REGIONS BOARD ── */
 #board-area{display:flex;flex-direction:column;gap:10px}
-.board-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-/* board is now SVG inline */
 
-/* ── MARKETPLACE ── */
-.marketplace{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:13px;padding:12px;
-}
+.marketplace{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:12px;}
 .market-cards{display:flex;gap:8px;flex-wrap:wrap;min-height:40px}
 
-/* ── HAND ── */
-.hand-area{
-  background:var(--panel);border:1px solid var(--border);
-  border-radius:13px;padding:12px;
-}
+.hand-area{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:12px;}
 .hand-cards{display:flex;gap:8px;flex-wrap:wrap}
 
 /* ── POKEMON CARD ── */
 .poke-card{
-  width:115px;flex-shrink:0;
-  border:1px solid var(--border2);border-radius:12px;
+  width:115px;flex-shrink:0;border:1px solid var(--border2);border-radius:12px;
   padding:8px;cursor:pointer;user-select:none;
   background:linear-gradient(160deg,#1a1a30,#0f0f20);
   transition:all .15s;position:relative;overflow:hidden;
 }
-.poke-card::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:3px;
-}
+.poke-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;}
 .poke-card[data-region="Planície"]::after{background:var(--r-planicie)}
 .poke-card[data-region="Oceano"]::after{background:var(--r-oceano)}
 .poke-card[data-region="Vulcão"]::after{background:var(--r-vulcao)}
@@ -199,163 +164,113 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
 .poke-card[data-region="Tempestade"]::after{background:var(--r-tempestade)}
 .poke-card[data-region="Caverna"]::after{background:var(--r-caverna)}
 .poke-card:hover{transform:translateY(-3px);border-color:var(--border)}
-.poke-card.selected{
-  outline:2px solid var(--gold);outline-offset:1px;
-  transform:translateY(-5px);background:linear-gradient(160deg,#2a2018,#1a1408);
-}
+.poke-card.selected{outline:2px solid var(--gold);outline-offset:1px;transform:translateY(-5px);background:linear-gradient(160deg,#2a2018,#1a1408);}
 .poke-card.leader-glow{outline:2px solid var(--green);outline-offset:1px}
 
 .card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
 .card-type-emoji{font-size:16px}
-.card-stage{
-  font-size:9px;border-radius:99px;padding:2px 5px;border:1px solid;
-  font-family:var(--font-title);letter-spacing:.3px;
-}
+.card-stage{font-size:9px;border-radius:99px;padding:2px 5px;border:1px solid;font-family:var(--font-title);letter-spacing:.3px;}
 .stage-base{border-color:#8a85aa55;color:var(--muted);background:#8a85aa11}
 .stage-evo{border-color:#d94f5c55;color:var(--red);background:#d94f5c11}
 .stage-lend{border-color:#c9a84c77;color:var(--gold2);background:#c9a84c11}
 
-.card-art{
-  width:100%;height:75px;border-radius:8px;
-  background:#ffffff06;border:1px solid #ffffff0a;
-  display:flex;align-items:center;justify-content:center;
-  overflow:hidden;margin-bottom:5px;
-}
+.card-art{width:100%;height:75px;border-radius:8px;background:#ffffff06;border:1px solid #ffffff0a;display:flex;align-items:center;justify-content:center;overflow:hidden;margin-bottom:5px;}
 .card-art img{width:100%;height:100%;object-fit:contain}
 .card-art .no-img{font-size:28px}
 
 .card-name{font-family:var(--font-title);font-size:10px;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .card-info{font-size:10px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card-power{
-  font-family:var(--font-title);font-size:11px;
-  position:absolute;top:6px;right:6px;
-  background:#c9a84c22;border:1px solid #c9a84c44;
-  border-radius:99px;width:18px;height:18px;
-  display:flex;align-items:center;justify-content:center;color:var(--gold2);
-}
+.card-power{font-family:var(--font-title);font-size:11px;position:absolute;top:6px;right:6px;background:#c9a84c22;border:1px solid #c9a84c44;border-radius:99px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;color:var(--gold2);}
 
-/* ── PLAYED BANDS ── */
+/* ── BOT INDICATOR ── */
+.bot-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:9px;background:#ff8c4222;border:1px solid #ff8c4255;
+  border-radius:99px;padding:2px 7px;color:var(--bot);
+  font-family:var(--font-title);
+}
+.bot-thinking{
+  animation:pulse 1s ease-in-out infinite;
+  background:#ff8c4233!important;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── BOT ACTION OVERLAY ── */
+#bot-overlay{
+  position:fixed;bottom:20px;right:20px;
+  background:linear-gradient(135deg,#1a1422,#130f1e);
+  border:1px solid #ff8c4444;border-radius:14px;
+  padding:12px 16px;z-index:300;
+  font-size:12px;color:var(--bot);
+  display:none;max-width:260px;
+  box-shadow:0 4px 20px #00000066;
+}
+#bot-overlay.visible{display:block}
+#bot-overlay .bot-title{font-family:var(--font-title);font-size:11px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+#bot-overlay .bot-action{color:var(--text);font-size:11px;margin-top:3px}
+
+/* ── BANDS ── */
 .bands-area{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:12px}
-.band-row{
-  display:flex;gap:6px;align-items:flex-start;margin-bottom:8px;
-  padding:8px;border:1px solid var(--border);border-radius:10px;background:#ffffff04;
-}
+.band-row{display:flex;gap:6px;align-items:flex-start;margin-bottom:8px;padding:8px;border:1px solid var(--border);border-radius:10px;background:#ffffff04;}
 .band-info{font-size:11px;color:var(--muted);margin-top:2px}
-.band-leader-badge{
-  font-size:9px;background:var(--green);color:#001a08;
-  border-radius:99px;padding:1px 5px;font-weight:700;
-  display:inline-block;margin-top:2px;
-}
+.band-leader-badge{font-size:9px;background:var(--green);color:#001a08;border-radius:99px;padding:1px 5px;font-weight:700;display:inline-block;margin-top:2px;}
 
-/* ── ACTION BAR ── */
 #action-bar{
   background:linear-gradient(145deg,var(--panel2),var(--panel));
   border:1px solid var(--border2);border-radius:14px;padding:12px 16px;
   display:flex;align-items:center;gap:10px;flex-wrap:wrap;
 }
-.turn-badge{
-  font-family:var(--font-title);font-size:12px;color:var(--gold2);
-  background:#c9a84c18;border:1px solid #c9a84c33;
-  border-radius:99px;padding:5px 12px;
-}
+.turn-badge{font-family:var(--font-title);font-size:12px;color:var(--gold2);background:#c9a84c18;border:1px solid #c9a84c33;border-radius:99px;padding:5px 12px;}
 .action-hint{font-size:13px;color:var(--muted);flex:1}
-.spacer{flex:1}
-
-/* ── BAND VALIDATION ── */
 .val-ok{color:var(--green);font-size:12px}
 .val-err{color:var(--red);font-size:12px}
 
-/* ── LOG ── */
-.log-box{
-  max-height:140px;overflow-y:auto;
-  background:#050510;border:1px solid var(--border);
-  border-radius:10px;padding:8px 10px;
-  font-family:'Courier New',monospace;font-size:11px;color:#9090b8;line-height:1.6;
-}
+.log-box{max-height:140px;overflow-y:auto;background:#050510;border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-family:'Courier New',monospace;font-size:11px;color:#9090b8;line-height:1.6;}
 .log-line{border-bottom:1px solid #ffffff06;padding:2px 0}
 .log-line:last-child{border-bottom:none}
 .log-era{color:var(--gold)}
 .log-glory{color:var(--green)}
 .log-dragon{color:var(--red)}
 .log-band{color:var(--blue)}
+.log-bot{color:var(--bot)}
 
-/* ── MODAL ── */
-.modal-overlay{
-  position:fixed;inset:0;background:#00000099;
-  display:flex;align-items:center;justify-content:center;
-  z-index:200;backdrop-filter:blur(4px);
-}
+.modal-overlay{position:fixed;inset:0;background:#00000099;display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px);}
 .modal-overlay.hidden{display:none}
-.modal{
-  background:linear-gradient(145deg,var(--panel2),var(--panel));
-  border:1px solid var(--border2);border-radius:18px;
-  padding:24px;max-width:480px;width:90%;max-height:85vh;overflow-y:auto;
-}
+.modal{background:linear-gradient(145deg,var(--panel2),var(--panel));border:1px solid var(--border2);border-radius:18px;padding:24px;max-width:480px;width:90%;max-height:85vh;overflow-y:auto;}
 .modal h2{font-family:var(--font-title);font-size:16px;color:var(--gold2);margin-bottom:8px}
 .modal p{color:var(--muted);font-size:13px;line-height:1.6;margin-bottom:14px}
 .modal-cards{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:10px 0}
 .modal-btn-row{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 
-/* ── ERA END MODAL ── */
 .era-results{margin:10px 0}
-.era-region-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:7px 10px;border-radius:8px;background:#ffffff06;border:1px solid var(--border);margin-bottom:5px;
-}
+.era-region-row{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:8px;background:#ffffff06;border:1px solid var(--border);margin-bottom:5px;}
 .era-region-name{font-family:var(--font-title);font-size:11px}
 .era-region-awards{font-size:12px;color:var(--muted)}
 
-/* ── WINNER SCREEN ── */
 #screen-winner{max-width:500px;margin:60px auto;text-align:center}
 .winner-title{font-family:var(--font-title);font-size:36px;color:var(--gold2);margin-bottom:8px}
 .winner-name{font-family:var(--font-title);font-size:24px;color:var(--text);margin-bottom:20px}
 .final-scores{display:flex;flex-direction:column;gap:8px;margin:20px 0}
-.final-score-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;border-radius:10px;
-  background:var(--panel);border:1px solid var(--border);
-}
+.final-score-row{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:10px;background:var(--panel);border:1px solid var(--border);}
 .final-score-row.winner-row{background:#c9a84c18;border-color:#c9a84c44}
 .fs-name{font-family:var(--font-title);font-size:14px}
 .fs-score{font-family:var(--font-title);font-size:20px;color:var(--gold2)}
 
-/* ── PLAYER COLOR PALETTE ── */
-.pc0{color:#f5c842}
-.pc1{color:#4db8d4}
-.pc2{color:#d94f5c}
-.pc3{color:#52c47a}
-.bg-pc0{background:#f5c84244}
-.bg-pc1{background:#4db8d444}
-.bg-pc2{background:#d94f5c44}
-.bg-pc3{background:#52c47a44}
-.dot-pc0{background:#f5c842}
-.dot-pc1{background:#4db8d4}
-.dot-pc2{background:#d94f5c}
-.dot-pc3{background:#52c47a}
+.pc0{color:#f5c842}.pc1{color:#4db8d4}.pc2{color:#d94f5c}.pc3{color:#52c47a}
+.bg-pc0{background:#f5c84244}.bg-pc1{background:#4db8d444}.bg-pc2{background:#d94f5c44}.bg-pc3{background:#52c47a44}
+.dot-pc0{background:#f5c842}.dot-pc1{background:#4db8d4}.dot-pc2{background:#d94f5c}.dot-pc3{background:#52c47a}
 
-/* ── TOOLTIP ── */
-.tooltip{position:relative}
-.tooltip:hover .tip{display:block}
-.tip{display:none;position:absolute;bottom:110%;left:50%;transform:translateX(-50%);
-  background:#1a1730;border:1px solid var(--border2);border-radius:8px;
-  padding:6px 10px;font-size:11px;color:var(--text);white-space:nowrap;z-index:50;
-  pointer-events:none;
-}
-
-/* ── BAND SIZE GLORY TABLE ── */
+.tag{display:inline-block;font-size:10px;border:1px solid var(--border);border-radius:99px;padding:2px 7px;color:var(--muted)}
+.empty-state{color:var(--muted);font-size:12px;font-style:italic;padding:8px 0}
 .glory-table{display:flex;gap:4px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
 .gt-cell{padding:2px 5px;border:1px solid var(--border);border-radius:5px;background:#ffffff04}
 .gt-cell b{color:var(--gold2)}
-
-/* ── MISC ── */
-.tag{display:inline-block;font-size:10px;border:1px solid var(--border);border-radius:99px;padding:2px 7px;color:var(--muted)}
-.empty-state{color:var(--muted);font-size:12px;font-style:italic;padding:8px 0}
 </style>
 </head>
 <body>
 <div id="app">
 <header>
-  <div class="logo">Ethnos Pokémon <span>v2.0 — Regras Completas</span></div>
+  <div class="logo">Ethnos Pokémon <span>v2.1 — com Bot IA</span></div>
   <button class="btn btn-secondary btn-sm" id="resetBtn">↺ Reset</button>
 </header>
 <main>
@@ -364,7 +279,7 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
 <div class="screen active" id="screen-setup">
   <div class="setup-card">
     <div class="setup-title">⚔️ Novo Jogo</div>
-    <div class="setup-sub">Jogo completo de Ethnos Pokémon — Eras, Dragões, Mercado, Glória por região e por bando, Sistema de Evolução.</div>
+    <div class="setup-sub">Configure os jogadores. Ative o <span style="color:var(--bot)">🤖 Bot</span> para tornar qualquer jogador controlado por IA.</div>
     <div class="hr"></div>
     <div class="form-group">
       <label>Número de jogadores</label>
@@ -377,22 +292,14 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
     <div id="player-name-inputs"></div>
     <div class="hr"></div>
     <div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:16px">
-      <b style="color:var(--gold)">Regras desta versão:</b><br>
-      • 2 ações por turno: Recrutar (deck ou mercado) ou Jogar Bando<br>
-      • Bando = mesmo Tipo ou mesma Região · Escolha o Líder (topo)<br>
-      • Marcador de controle só se bando ≥ marcadores já na região + 1<br>
-      • Cartas restantes na mão vão pro mercado ao jogar bando<br>
-      • 3 Dragões no deck → fim da Era → pontuação de região + bando<br>
-      • <b style="color:var(--red)">Sistema de Evolução:</b> Base=1pt · Evoluído=2pt · Lendário=3pt de controle
+      <b style="color:var(--gold)">Regras:</b> Mesmo Tipo OU mesma Região · Marcador se bando ≥ controle+1 · 3 Dragões = fim da Era<br>
+      <b style="color:var(--bot)">Bot IA:</b> Prioriza bandos grandes · Analisa controle de regiões · Escolhe líder mais forte · Bloqueia oponentes
     </div>
     <div class="glory-table" style="margin-bottom:16px">
       <span style="color:var(--muted);font-size:11px;margin-right:4px">Glória por bando:</span>
-      <div class="gt-cell">1→<b>0</b></div>
-      <div class="gt-cell">2→<b>1</b></div>
-      <div class="gt-cell">3→<b>3</b></div>
-      <div class="gt-cell">4→<b>6</b></div>
-      <div class="gt-cell">5→<b>10</b></div>
-      <div class="gt-cell">6+→<b>15</b></div>
+      <div class="gt-cell">1→<b>0</b></div><div class="gt-cell">2→<b>1</b></div>
+      <div class="gt-cell">3→<b>3</b></div><div class="gt-cell">4→<b>6</b></div>
+      <div class="gt-cell">5→<b>10</b></div><div class="gt-cell">6+→<b>15</b></div>
     </div>
     <button class="btn btn-primary" id="startBtn" style="width:100%">Iniciar Partida</button>
   </div>
@@ -401,8 +308,6 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
 <!-- GAME -->
 <div class="screen" id="screen-game">
   <div id="side-panel">
-
-    <!-- ERA & DRAGÕES -->
     <div class="panel-card">
       <div class="panel-title">Era Atual</div>
       <div class="era-indicator" id="eraIndicator"></div>
@@ -414,20 +319,14 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
       </div>
       <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:6px" id="deckCount">Deck: — cartas</div>
     </div>
-
-    <!-- SCORES -->
     <div class="panel-card">
       <div class="panel-title">Glória (Pontuação)</div>
       <div id="scoreList"></div>
     </div>
-
-    <!-- BANDS PLAYED -->
     <div class="panel-card">
       <div class="panel-title">Bandos em Jogo</div>
       <div id="bandsPlayed"></div>
     </div>
-
-    <!-- LOG -->
     <div class="panel-card">
       <div class="panel-title">Log</div>
       <div class="log-box" id="logBox"></div>
@@ -435,7 +334,6 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
   </div>
 
   <div id="board-area">
-    <!-- ACTION BAR -->
     <div id="action-bar">
       <div class="turn-badge" id="turnBadge">—</div>
       <div class="action-hint" id="actionHint">—</div>
@@ -447,7 +345,6 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
       </div>
     </div>
 
-    <!-- MARKETPLACE -->
     <div class="marketplace">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span class="panel-title" style="margin:0">Mercado (Cartas Abertas)</span>
@@ -456,7 +353,6 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
       <div class="market-cards" id="marketCards"></div>
     </div>
 
-    <!-- BOARD MAP -->
     <div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span class="panel-title" style="margin:0">Tabuleiro — 6 Regiões</span>
@@ -467,7 +363,6 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
       </div>
     </div>
 
-    <!-- HAND -->
     <div class="hand-area">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <span class="panel-title" style="margin:0" id="handTitle">Mão do Jogador</span>
@@ -477,7 +372,6 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
         <div class="empty-state">Sem cartas na mão.</div>
       </div>
     </div>
-
   </div>
 </div>
 
@@ -488,7 +382,6 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
   <div class="final-scores" id="finalScores"></div>
   <button class="btn btn-primary" id="playAgainBtn" style="width:100%;margin-top:10px">Jogar Novamente</button>
 </div>
-
 </main>
 </div>
 
@@ -496,7 +389,7 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
 <div class="modal-overlay hidden" id="leaderModal">
   <div class="modal">
     <h2>⚔️ Escolha o Líder do Bando</h2>
-    <p>O Líder vai ao topo do bando. Sua cor define a região de controle. Sua raridade determina o valor de controle adicionado (Base=1, Evoluído=2, Lendário=3).</p>
+    <p>O Líder define a região de controle. Raridade determina o valor adicionado (Base=1, Evoluído=2, Lendário=3).</p>
     <div class="modal-cards" id="leaderModalCards"></div>
     <div class="modal-btn-row">
       <button class="btn btn-danger btn-sm" id="leaderCancelBtn">Cancelar</button>
@@ -515,6 +408,12 @@ main{flex:1;padding:14px 16px;max-width:1400px;width:100%;margin:0 auto}
       <button class="btn btn-primary" id="eraOkBtn">Continuar →</button>
     </div>
   </div>
+</div>
+
+<!-- BOT OVERLAY -->
+<div id="bot-overlay">
+  <div class="bot-title">🤖 <span id="botOverlayName">Bot</span> está pensando...</div>
+  <div class="bot-action" id="botOverlayAction">Analisando situação...</div>
 </div>
 
 <script>
@@ -538,19 +437,14 @@ const REGIONS = [
   {id:"Caverna",emoji:"🪨",color:"--r-caverna"},
 ];
 
-// Glory tokens per region — randomized per game (values 1..10 range)
 const GLORY_POOLS = [2,3,4,5,6,7,8,9,10];
-
 const STAGES = [
   {id:"Base",label:"Base",cls:"stage-base",controlValue:1},
   {id:"Evo",label:"Evoluído",cls:"stage-evo",controlValue:2},
   {id:"Lend",label:"Lendário",cls:"stage-lend",controlValue:3},
 ];
-
-// Band size → glory points (official Ethnos table)
 const BAND_GLORY = [0,0,1,3,6,10,15,15,15,15,15];
 
-// Fallback pool
 const FALLBACK = {
   "Fogo":[{id:37,name:"Vulpix"},{id:58,name:"Growlithe"},{id:155,name:"Cyndaquil"},{id:324,name:"Torkoal"},{id:4,name:"Charmander"},{id:5,name:"Charmeleon"},{id:6,name:"Charizard"}],
   "Água":[{id:7,name:"Squirtle"},{id:54,name:"Psyduck"},{id:60,name:"Poliwag"},{id:129,name:"Magikarp"},{id:8,name:"Wartortle"},{id:9,name:"Blastoise"},{id:134,name:"Vaporeon"}],
@@ -566,12 +460,12 @@ const FALLBACK = {
   "Normal":[{id:133,name:"Eevee"},{id:216,name:"Teddiursa"},{id:300,name:"Skitty"},{id:659,name:"Bunnelby"},{id:143,name:"Snorlax"},{id:242,name:"Blissey"},{id:234,name:"Stantler"}],
 };
 
-function artUrl(id){return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`}
-
+function artUrl(id){return`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`}
 function uid(){return Math.random().toString(36).slice(2)+Date.now().toString(36)}
 function rand(n){return Math.floor(Math.random()*n)}
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rand(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 function pick(a){return a[rand(a.length)]}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
 
 // ═══════════════════════════════════════════════════════
 // DECK BUILDING
@@ -582,7 +476,6 @@ function buildDeck(){
   for(const t of TYPES){
     const pool=FALLBACK[t.id]||[];
     for(const r of REGIONS){
-      // 2 cards per (type × region)
       for(let k=0;k<2;k++){
         const roll=Math.random();
         const stage=roll<0.65?STAGES[0]:roll<0.90?STAGES[1]:STAGES[2];
@@ -602,11 +495,10 @@ function buildDeck(){
 }
 
 function buildGloryTokens(){
-  // Each region gets 3 tokens (I, II, III) — random values 2..10
   const tokens={};
   for(const r of REGIONS){
     const vals=shuffle([...GLORY_POOLS]).slice(0,3).sort((a,b)=>a-b);
-    tokens[r.id]=vals; // [I, II, III]
+    tokens[r.id]=vals;
   }
   return tokens;
 }
@@ -617,6 +509,7 @@ function buildGloryTokens(){
 
 const S={
   players:[],
+  isBot:[],      // bool per player
   nPlayers:0,
   current:0,
   era:1,
@@ -625,13 +518,14 @@ const S={
   deck:[],
   market:[],
   hands:[],
-  bands:[], // [{playerIdx, cards:[], leaderIdx}]
-  control:{}, // regionId -> {playerIdx -> controlCount}
-  glory:{}, // playerIdx -> points
-  gloryTokens:{}, // regionId -> [I,II,III]
+  bands:[],
+  control:{},
+  glory:{},
+  gloryTokens:{},
   selectedIds:new Set(),
   log:[],
   started:false,
+  botActive:false,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -639,6 +533,7 @@ const S={
 // ═══════════════════════════════════════════════════════
 
 function currentPlayer(){return S.players[S.current]}
+function isCurrentBot(){return S.isBot[S.current]}
 function playerColor(i){return`pc${i%4}`}
 
 function pushLog(msg,cls=''){
@@ -661,13 +556,295 @@ function regionController(regionId){
 }
 
 function insertDragons(){
-  // shuffle 3 dragons into bottom half
   const top=S.deck.splice(0,Math.ceil(S.deck.length/2));
   const bottom=S.deck;
   const dragons=[{uid:'d0',isDragon:true},{uid:'d1',isDragon:true},{uid:'d2',isDragon:true}];
   bottom.push(...dragons);
   shuffle(bottom);
   S.deck=[...top,...bottom];
+}
+
+// ═══════════════════════════════════════════════════════
+// BOT AI
+// ═══════════════════════════════════════════════════════
+
+const BOT = {
+
+  // ── Find all valid bands from a hand ──
+  findAllBands(hand){
+    const bands=[];
+    // Group by type
+    const byType={};
+    for(const c of hand){
+      if(!byType[c.type])byType[c.type]=[];
+      byType[c.type].push(c);
+    }
+    for(const cards of Object.values(byType)){
+      if(cards.length>=2) bands.push(cards);
+    }
+    // Group by region
+    const byRegion={};
+    for(const c of hand){
+      if(!byRegion[c.region])byRegion[c.region]=[];
+      byRegion[c.region].push(c);
+    }
+    for(const cards of Object.values(byRegion)){
+      if(cards.length>=2) bands.push(cards);
+    }
+    // Also single cards (can always play a band of 1, just 0 glory)
+    for(const c of hand) bands.push([c]);
+    return bands;
+  },
+
+  // ── Score a potential band + leader combination ──
+  scoreBand(cards, leader, pi){
+    let score=0;
+
+    // 1. Glory from band size
+    score += gloryForBand(cards.length) * 3;
+
+    // 2. Control value from leader stage
+    score += leader.controlValue * 2;
+
+    // 3. Region strategic value
+    const regionId=leader.region;
+    const tokens=S.gloryTokens[regionId]||[0,0,0];
+    const tokenVal=tokens[Math.min(S.era-1,2)]||0;
+    score += tokenVal * 1.5;
+
+    // 4. Can we place a control marker?
+    const ctrl=S.control[regionId]||{};
+    const myCtrl=ctrl[pi]||0;
+    const canPlace=cards.length > myCtrl;
+    if(canPlace) score += 10;
+
+    // 5. Can we displace leader / tie with opponent?
+    const{winners,count}=regionController(regionId);
+    if(winners.length>0 && !winners.includes(pi)){
+      // opponent controls this region — high value to contest
+      if(canPlace) score += 15;
+    }
+    if(winners.includes(pi)){
+      // we already lead — still worth reinforcing
+      score += 5;
+    }
+
+    // 6. Discard penalty — how many cards are we discarding?
+    const hand=S.hands[pi];
+    const discardCount=hand.length - cards.length;
+    score -= discardCount * 0.5;
+
+    // 7. Prefer larger bands
+    score += cards.length * 1.5;
+
+    return score;
+  },
+
+  // ── Pick best leader for a given set of cards ──
+  bestLeader(cards, pi){
+    let best=null, bestScore=-Infinity;
+    for(const c of cards){
+      let s=0;
+      // Higher control value is better
+      s += c.controlValue * 4;
+      // Token value of leader's region
+      const tokens=S.gloryTokens[c.region]||[0,0,0];
+      s += (tokens[Math.min(S.era-1,2)]||0) * 2;
+      // Prefer region where we can contest
+      const{winners}=regionController(c.region);
+      if(winners.length>0 && !winners.includes(pi)) s += 8;
+      if(winners.includes(pi)) s += 3;
+      // Slight randomness to avoid predictability
+      s += Math.random()*2;
+      if(s>bestScore){bestScore=s;best=c;}
+    }
+    return best||cards[0];
+  },
+
+  // ── Score a card to recruit from market ──
+  scoreCardToRecruit(card, pi){
+    const hand=S.hands[pi];
+    let score=0;
+
+    // Does it extend an existing type or region group in hand?
+    const sameType=hand.filter(c=>c.type===card.type).length;
+    const sameRegion=hand.filter(c=>c.region===card.region).length;
+    score += sameType * 5;
+    score += sameRegion * 4;
+
+    // Prefer high control value cards
+    score += card.controlValue * 3;
+
+    // Token value
+    const tokens=S.gloryTokens[card.region]||[0,0,0];
+    score += (tokens[Math.min(S.era-1,2)]||0) * 1.5;
+
+    // Prefer contested regions
+    const{winners}=regionController(card.region);
+    if(winners.length>0 && !winners.includes(pi)) score += 6;
+
+    score += Math.random()*3;
+    return score;
+  },
+
+  // ── Main decision function ──
+  async takeTurn(pi){
+    const hand=S.hands[pi];
+    const playerName=S.players[pi];
+
+    // Show bot overlay
+    showBotOverlay(playerName,'Analisando mão...');
+    await sleep(600);
+
+    // DECISION 1: Should we play a band?
+    // Play if: hand has 7+ cards OR a very good band exists OR hand full
+    const allBands=this.findAllBands(hand);
+    const viableBands=allBands.filter(b=>b.length>=2);
+
+    // Evaluate best band
+    let bestBandScore=-Infinity, bestBand=null, bestBandLeader=null;
+    for(const cards of viableBands){
+      const leader=this.bestLeader(cards,pi);
+      const sc=this.scoreBand(cards,leader,pi);
+      if(sc>bestBandScore){bestBandScore=sc;bestBand=cards;bestBandLeader=leader;}
+    }
+
+    const shouldPlayBand=
+      hand.length>=7 ||
+      hand.length>=10 ||
+      (bestBand&&bestBandScore>25&&hand.length>=3) ||
+      (bestBand&&hand.length>=5);
+
+    if(shouldPlayBand && bestBand){
+      // Play the best band
+      const leader=bestBandLeader;
+      showBotOverlay(playerName,`Jogando bando de ${bestBand.length} carta(s)...`);
+      await sleep(700);
+
+      // Execute band play
+      this.executeBandPlay(pi, bestBand, leader);
+      hideBotOverlay();
+      return;
+    }
+
+    // DECISION 2: Recruit (deck vs market)
+    if(hand.length>=10){
+      // Must play a band (fallback: play any band or single)
+      if(viableBands.length>0){
+        const fallbackBand=viableBands[0];
+        const leader=this.bestLeader(fallbackBand,pi);
+        showBotOverlay(playerName,'Mão cheia! Jogando bando...');
+        await sleep(600);
+        this.executeBandPlay(pi,fallbackBand,leader);
+      } else {
+        // Play a single card
+        const singleCard=hand[0];
+        showBotOverlay(playerName,'Mão cheia! Jogando carta única...');
+        await sleep(500);
+        this.executeBandPlay(pi,[singleCard],singleCard);
+      }
+      hideBotOverlay();
+      return;
+    }
+
+    // Evaluate market cards
+    let bestMarketCard=null, bestMarketScore=-Infinity;
+    for(const c of S.market){
+      const sc=this.scoreCardToRecruit(c,pi);
+      if(sc>bestMarketScore){bestMarketScore=sc;bestMarketCard=c;}
+    }
+
+    // Decide: market vs deck
+    // Prefer market if there's a very synergistic card (score > 12)
+    const preferMarket = bestMarketCard && bestMarketScore > 12 && S.market.length > 0;
+
+    if(preferMarket){
+      showBotOverlay(playerName,`Recrutando do mercado: ${bestMarketCard.typeEmoji} ${bestMarketCard.pokemonName}`);
+      await sleep(800);
+      hideBotOverlay();
+      // Recruit from market (uses drawFromMarket which also calls endTurn)
+      drawFromMarket(bestMarketCard.uid, true);
+    } else if(S.deck.length>0){
+      showBotOverlay(playerName,'Sacando carta do deck...');
+      await sleep(600);
+      hideBotOverlay();
+      const c=drawFromDeck(pi);
+      if(c && S.dragons<3){
+        endTurn(true);
+      }
+    } else if(S.market.length>0 && bestMarketCard){
+      showBotOverlay(playerName,'Deck vazio, recrutando do mercado...');
+      await sleep(600);
+      hideBotOverlay();
+      drawFromMarket(bestMarketCard.uid, true);
+    } else {
+      // Nothing to do — pass
+      showBotOverlay(playerName,'Passando turno...');
+      await sleep(400);
+      hideBotOverlay();
+      endTurn(true);
+    }
+  },
+
+  executeBandPlay(pi, cards, leader){
+    const regionId=leader.region;
+    const ctrlMap=S.control[regionId];
+    const currentCtrl=ctrlMap[pi]||0;
+
+    let placedMarker=false;
+    if(cards.length>currentCtrl){
+      ctrlMap[pi]=(currentCtrl+leader.controlValue);
+      placedMarker=true;
+    }
+
+    // Discard rest of hand to market
+    const selIds=new Set(cards.map(c=>c.uid));
+    const discarded=S.hands[pi].filter(c=>!selIds.has(c.uid));
+    S.market.push(...discarded);
+    S.hands[pi]=[];
+
+    // Determine mode
+    const types=new Set(cards.map(c=>c.type));
+    const regions=new Set(cards.map(c=>c.region));
+    const mode=types.size===1?'Tipo':'Região';
+
+    S.bands.push({playerIdx:pi,cards,leaderIdx:cards.indexOf(leader),era:S.era});
+    S.selectedIds=new Set();
+
+    const ctrlTxt=placedMarker?` → +${leader.controlValue} controle em ${leader.regionEmoji} ${regionId}`:'(sem marcador)';
+    pushLog(`🤖 ${S.players[pi]} jogou bando de ${cards.length} [${mode}] · Líder: ${leader.typeEmoji} ${leader.pokemonName} (${leader.stageLabel})${ctrlTxt}`,'log-bot');
+    if(discarded.length) pushLog(`${discarded.length} carta(s) ao mercado.`,'log-bot');
+
+    endTurn(true);
+  },
+};
+
+// ── Bot overlay helpers ──
+function showBotOverlay(name, action){
+  const ov=document.getElementById('bot-overlay');
+  document.getElementById('botOverlayName').textContent=name;
+  document.getElementById('botOverlayAction').textContent=action;
+  ov.classList.add('visible');
+}
+function hideBotOverlay(){
+  document.getElementById('bot-overlay').classList.remove('visible');
+}
+
+// ── Trigger bot turn if current player is bot ──
+async function maybeTriggerBot(){
+  if(!S.started||S.botActive)return;
+  if(!isCurrentBot())return;
+  S.botActive=true;
+  renderAll();
+  await sleep(400);
+  await BOT.takeTurn(S.current);
+  S.botActive=false;
+  renderAll();
+  // Chain — check if next player is also bot
+  await sleep(200);
+  if(S.started&&isCurrentBot()&&!S.botActive){
+    maybeTriggerBot();
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -679,9 +856,12 @@ function startGame(){
   S.nPlayers=n;
   S.maxEra=n<=3?2:3;
   S.players=[];
+  S.isBot=[];
   for(let i=0;i<n;i++){
     const inp=document.getElementById(`pname-${i}`);
     S.players.push((inp?.value||`Jogador ${i+1}`).trim()||`Jogador ${i+1}`);
+    const botChk=document.getElementById(`pbot-${i}`);
+    S.isBot.push(botChk?.checked||false);
   }
   S.current=rand(n);
   S.era=1;
@@ -696,29 +876,28 @@ function startGame(){
   S.selectedIds=new Set();
   S.log=[];
   S.started=true;
-
-  for(const r of REGIONS){S.control[r.id]={}}
+  S.botActive=false;
+  for(const r of REGIONS)S.control[r.id]={};
   for(let i=0;i<n;i++)S.glory[i]=0;
-
   beginAge();
 }
 
 function beginAge(){
-  // each player draws 1
   for(let i=0;i<S.nPlayers;i++)drawFromDeck(i,true);
-  // open market: 2×nPlayers cards
   const mCount=2*S.nPlayers;
   for(let k=0;k<mCount;k++){
     if(S.deck.length){
       const c=S.deck.shift();
-      if(c.isDragon){handleDragonDraw(c)}
+      if(c.isDragon)handleDragonDraw(c);
       else S.market.push(c);
     }
   }
   insertDragons();
-  pushLog(`Era ${S.era} iniciada! Mercado com ${S.market.length} cartas abertas.`,'log-era');
+  pushLog(`Era ${S.era} iniciada! Mercado com ${S.market.length} cartas.`,'log-era');
   showScreen('game');
   renderAll();
+  // Trigger bot if first player is bot
+  setTimeout(()=>maybeTriggerBot(),800);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -726,20 +905,12 @@ function beginAge(){
 // ═══════════════════════════════════════════════════════
 
 function drawFromDeck(pi,silent=false){
-  if(!S.deck.length){
-    if(!silent)pushLog('Deck vazio!');
-    return null;
-  }
-  if(!silent&&S.hands[S.current].length>=10){
-    pushLog('Mão cheia (10 cartas)! Jogue um bando primeiro.');
-    return null;
-  }
+  if(!S.deck.length){if(!silent)pushLog('Deck vazio!');return null;}
+  if(!silent&&S.hands[S.current].length>=10){pushLog('Mão cheia! Jogue um bando primeiro.');return null;}
   let c=S.deck.shift();
   if(c&&c.isDragon){
     handleDragonDraw(c);
-    // draw again
-    if(S.deck.length){c=S.deck.shift();if(c&&c.isDragon){handleDragonDraw(c);if(S.deck.length){c=S.deck.shift();if(c&&c.isDragon){handleDragonDraw(c);return null;}}else return null;}
-    }else return null;
+    if(S.deck.length){c=S.deck.shift();if(c&&c.isDragon){handleDragonDraw(c);if(S.deck.length){c=S.deck.shift();if(c&&c.isDragon){handleDragonDraw(c);return null;}}else return null;}}else return null;
   }
   if(!c)return null;
   S.hands[pi].push(c);
@@ -747,14 +918,15 @@ function drawFromDeck(pi,silent=false){
   return c;
 }
 
-function drawFromMarket(cardUid){
-  if(S.hands[S.current].length>=10){pushLog('Mão cheia! Jogue um bando primeiro.');return;}
+function drawFromMarket(cardUid, silent=false){
+  if(!silent&&S.hands[S.current].length>=10){pushLog('Mão cheia!');return;}
+  const pi = silent ? S.current : S.current;
   const idx=S.market.findIndex(c=>c.uid===cardUid);
   if(idx<0)return;
   const[c]=S.market.splice(idx,1);
-  S.hands[S.current].push(c);
-  pushLog(`${currentPlayer()} recrutou do mercado: ${c.typeEmoji} ${c.pokemonName} (${c.stageLabel} · ${c.regionEmoji} ${c.region})`);
-  endTurn();
+  S.hands[pi].push(c);
+  if(!silent)pushLog(`${currentPlayer()} recrutou do mercado: ${c.typeEmoji} ${c.pokemonName} (${c.stageLabel} · ${c.regionEmoji} ${c.region})`);
+  endTurn(silent);
 }
 
 function handleDragonDraw(c){
@@ -764,9 +936,7 @@ function handleDragonDraw(c){
   if(S.dragons>=3)triggerEraEnd();
 }
 
-function getSelected(){
-  return S.hands[S.current].filter(c=>S.selectedIds.has(c.uid));
-}
+function getSelected(){return S.hands[S.current].filter(c=>S.selectedIds.has(c.uid));}
 
 function validateBand(sel){
   if(sel.length<1)return{ok:false,why:'Selecione ao menos 1 carta.'};
@@ -777,216 +947,134 @@ function validateBand(sel){
   return{ok:false,why:'Bando inválido: mesmo Tipo OU mesma Região.'};
 }
 
-function openLeaderModal(selected, callback){
+function openLeaderModal(selected,callback){
   const modal=document.getElementById('leaderModal');
   const cont=document.getElementById('leaderModalCards');
   cont.innerHTML='';
   for(const c of selected){
     const el=makeCardEl(c,false);
     el.style.width='105px';
-    el.addEventListener('click',()=>{
-      modal.classList.add('hidden');
-      callback(c);
-    });
+    el.addEventListener('click',()=>{modal.classList.add('hidden');callback(c);});
     cont.appendChild(el);
   }
   modal.classList.remove('hidden');
-  document.getElementById('leaderCancelBtn').onclick=()=>{
-    modal.classList.add('hidden');
-    callback(null);
-  };
+  document.getElementById('leaderCancelBtn').onclick=()=>{modal.classList.add('hidden');callback(null);};
 }
 
 function playBand(){
   const sel=getSelected();
   const v=validateBand(sel);
   if(!v.ok){pushLog(v.why);return;}
-
   openLeaderModal(sel,(leader)=>{
     if(!leader)return;
-
     const pi=S.current;
     const regionId=leader.region;
     const ctrlMap=S.control[regionId];
     const currentCtrl=ctrlMap[pi]||0;
-
-    // Place control marker only if band size > current control count
     let placedMarker=false;
-    if(sel.length>currentCtrl){
-      ctrlMap[pi]=(currentCtrl+leader.controlValue);
-      placedMarker=true;
-    }
-
-    // Discard rest of hand to market
+    if(sel.length>currentCtrl){ctrlMap[pi]=(currentCtrl+leader.controlValue);placedMarker=true;}
     const selIds=new Set(sel.map(c=>c.uid));
     const discarded=S.hands[pi].filter(c=>!selIds.has(c.uid));
     S.market.push(...discarded);
     S.hands[pi]=[];
-
-    // Record band
     const leaderIdx=sel.indexOf(leader);
     S.bands.push({playerIdx:pi,cards:sel,leaderIdx,era:S.era});
-
     S.selectedIds=new Set();
-
-    const ctrlTxt=placedMarker?` → +${leader.controlValue} controle em ${leader.regionEmoji} ${regionId}`:'(sem marcador — bando pequeno demais)';
-    pushLog(`${S.players[pi]} jogou bando de ${sel.length} cartas [${v.mode==='type'?'Tipo':'Região'}] · Líder: ${leader.typeEmoji} ${leader.pokemonName} (${leader.stageLabel})${ctrlTxt}`,'log-band');
-    if(discarded.length)pushLog(`${discarded.length} carta(s) descartada(s) ao mercado.`);
-
+    const types=new Set(sel.map(c=>c.type));
+    const mode=types.size===1?'Tipo':'Região';
+    const ctrlTxt=placedMarker?` → +${leader.controlValue} controle em ${leader.regionEmoji} ${regionId}`:'(sem marcador)';
+    pushLog(`${S.players[pi]} jogou bando de ${sel.length} [${mode}] · Líder: ${leader.typeEmoji} ${leader.pokemonName} (${leader.stageLabel})${ctrlTxt}`,'log-band');
+    if(discarded.length)pushLog(`${discarded.length} carta(s) ao mercado.`);
     endTurn();
   });
 }
 
-function endTurn(){
+function endTurn(silent=false){
   S.selectedIds=new Set();
   S.current=(S.current+1)%S.nPlayers;
-  pushLog(`Vez de ${currentPlayer()}.`);
+  if(!silent)pushLog(`Vez de ${currentPlayer()}.`);
+  else pushLog(`Vez de ${currentPlayer()}.`);
   renderAll();
+  setTimeout(()=>maybeTriggerBot(),300);
 }
 
 function playerDrawDeck(){
   const c=drawFromDeck(S.current);
-  if(c){
-    // check if dragon triggered era end already
-    if(S.dragons<3)endTurn();
-  }
+  if(c&&S.dragons<3)endTurn();
   renderAll();
 }
 
 // ═══════════════════════════════════════════════════════
-// ERA END
+// ERA END (unchanged logic)
 // ═══════════════════════════════════════════════════════
 
 function triggerEraEnd(){
-  // Discard all hands to market
-  for(let i=0;i<S.nPlayers;i++){
-    S.market.push(...S.hands[i]);
-    S.hands[i]=[];
-  }
+  for(let i=0;i<S.nPlayers;i++){S.market.push(...S.hands[i]);S.hands[i]=[];}
   S.selectedIds=new Set();
-
-  // Score regions
   const regionAwards=[];
   for(const r of REGIONS){
-    const tokens=S.gloryTokens[r.id]; // [I,II,III]
+    const tokens=S.gloryTokens[r.id];
     const{winners,count}=regionController(r.id);
     if(winners.length===0||count<=0){regionAwards.push({region:r,awards:[]});continue;}
-
     const awards=[];
-    // Era determines how many places score
-    const placesScoring=Math.min(S.era,3);
-    const tokenIdx=S.era-1; // Era 1 → token[0], Era 2 → token[1], Era 3 → token[2]
-
+    const tokenIdx=S.era-1;
     if(winners.length>1){
-      // Tie for 1st: split top token
       const total=tokens[tokenIdx];
       const each=Math.floor(total/winners.length);
-      for(const w of winners){
-        S.glory[w]=(S.glory[w]||0)+each;
-        awards.push({player:S.players[w],pts:each,place:'1º (empate)'});
-      }
-      // 2nd place (if era 2+) — find next
+      for(const w of winners){S.glory[w]=(S.glory[w]||0)+each;awards.push({player:S.players[w],pts:each,place:'1º (empate)'});}
       if(S.era>=2){
-        const others=Object.entries(S.control[r.id])
-          .filter(([pi])=>!winners.includes(Number(pi)))
-          .sort((a,b)=>b[1]-a[1]);
-        if(others.length){
-          const[pi2,]= others[0];
-          const pts2=tokens[Math.max(0,tokenIdx-1)];
-          S.glory[Number(pi2)]=(S.glory[Number(pi2)]||0)+pts2;
-          awards.push({player:S.players[Number(pi2)],pts:pts2,place:'2º'});
-        }
+        const others=Object.entries(S.control[r.id]).filter(([pi])=>!winners.includes(Number(pi))).sort((a,b)=>b[1]-a[1]);
+        if(others.length){const[pi2,]=others[0];const pts2=tokens[Math.max(0,tokenIdx-1)];S.glory[Number(pi2)]=(S.glory[Number(pi2)]||0)+pts2;awards.push({player:S.players[Number(pi2)],pts:pts2,place:'2º'});}
       }
-    } else {
-      // Clear winner
+    }else{
+      const placesScoring=Math.min(S.era,3);
       for(let place=0;place<placesScoring;place++){
-        const tIdx=tokenIdx-place;
-        if(tIdx<0)break;
-        // find player in place
+        const tIdx=tokenIdx-place;if(tIdx<0)break;
         const sorted=Object.entries(S.control[r.id]).sort((a,b)=>b[1]-a[1]);
         if(place>=sorted.length)break;
-        const[piStr,]=sorted[place];
-        const pi=Number(piStr);
-        const pts=tokens[tIdx]||0;
-        S.glory[pi]=(S.glory[pi]||0)+pts;
+        const[piStr,]=sorted[place];const pi=Number(piStr);
+        const pts=tokens[tIdx]||0;S.glory[pi]=(S.glory[pi]||0)+pts;
         awards.push({player:S.players[pi],pts,place:`${place+1}º`});
       }
     }
     regionAwards.push({region:r,awards});
   }
-
-  // Score bands
   const bandGloryList=[];
   for(const b of S.bands.filter(b=>b.era===S.era)){
-    const pts=gloryForBand(b.cards.length);
-    S.glory[b.playerIdx]=(S.glory[b.playerIdx]||0)+pts;
-    if(pts>0){
-      const leader=b.cards[b.leaderIdx];
-      bandGloryList.push({player:S.players[b.playerIdx],size:b.cards.length,pts,leader});
-    }
+    const pts=gloryForBand(b.cards.length);S.glory[b.playerIdx]=(S.glory[b.playerIdx]||0)+pts;
+    if(pts>0){const leader=b.cards[b.leaderIdx];bandGloryList.push({player:S.players[b.playerIdx],size:b.cards.length,pts,leader});}
   }
-
   showEraModal(regionAwards,bandGloryList);
 }
 
 function showEraModal(regionAwards,bandGloryList){
   const modal=document.getElementById('eraModal');
-  const title=document.getElementById('eraModalTitle');
-  const desc=document.getElementById('eraModalDesc');
-  const results=document.getElementById('eraResults');
-  const bandRes=document.getElementById('bandGloryResults');
-
   const isLast=S.era>=S.maxEra;
-  title.textContent=isLast?`🏆 Fim do Jogo — Era ${S.era}`:`🐉 Fim da Era ${S.era}`;
-  desc.textContent=isLast
-    ?`A Era final terminou! Pontuação de regiões e bandos calculada. Veja o resultado final.`
-    :`A 3ª carta Dragão foi revelada! Calculando pontuação da Era ${S.era}...`;
-
+  document.getElementById('eraModalTitle').textContent=isLast?`🏆 Fim do Jogo — Era ${S.era}`:`🐉 Fim da Era ${S.era}`;
+  document.getElementById('eraModalDesc').textContent=isLast?'Era final! Veja o resultado.':'3º Dragão revelado! Calculando pontuação...';
+  const results=document.getElementById('eraResults');
   results.innerHTML='<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Pontuação de Regiões:</div>';
   for(const{region,awards}of regionAwards){
-    const row=document.createElement('div');
-    row.className='era-region-row';
-    const awardTxt=awards.length
-      ?awards.map(a=>`${a.place} ${a.player}: +${a.pts}`).join(' · ')
-      :'Sem controle';
+    const row=document.createElement('div');row.className='era-region-row';
+    const awardTxt=awards.length?awards.map(a=>`${a.place} ${a.player}: +${a.pts}`).join(' · '):'Sem controle';
     row.innerHTML=`<span class="era-region-name">${region.emoji} ${region.id}</span><span class="era-region-awards">${awardTxt}</span>`;
     results.appendChild(row);
   }
-
+  const bandRes=document.getElementById('bandGloryResults');
   bandRes.innerHTML='';
   if(bandGloryList.length){
     bandRes.innerHTML='<div style="font-size:12px;color:var(--muted);margin:8px 0 5px">Glória por Bandos:</div>';
-    for(const b of bandGloryList){
-      const d=document.createElement('div');
-      d.style.cssText='font-size:12px;padding:3px 0;color:var(--text)';
-      d.innerHTML=`${b.player}: bando de ${b.size} carta(s) → <b style="color:var(--gold2)">+${b.pts} glória</b>`;
-      bandRes.appendChild(d);
-    }
+    for(const b of bandGloryList){const d=document.createElement('div');d.style.cssText='font-size:12px;padding:3px 0;color:var(--text)';d.innerHTML=`${b.player}: bando de ${b.size} → <b style="color:var(--gold2)">+${b.pts} glória</b>`;bandRes.appendChild(d);}
   }
-
   modal.classList.remove('hidden');
-  document.getElementById('eraOkBtn').onclick=()=>{
-    modal.classList.add('hidden');
-    afterEra(isLast);
-  };
+  document.getElementById('eraOkBtn').onclick=()=>{modal.classList.add('hidden');afterEra(isLast);};
 }
 
 function afterEra(isLast){
-  if(isLast){
-    showWinner();
-    return;
-  }
-  // Reset for next era
-  S.era++;
-  S.dragons=0;
-  // Reset dragon pips
+  if(isLast){showWinner();return;}
+  S.era++;S.dragons=0;
   for(let i=0;i<3;i++)document.getElementById(`dp${i}`)?.classList.remove('revealed');
-  // Keep control markers on board (they accumulate)
-  // Bands cleared for next era scoring
-  S.deck=buildDeck();
-  insertDragons();
-  S.market=[];
-  // First player = least glory
+  S.deck=buildDeck();insertDragons();S.market=[];
   let minGlory=Infinity,minPlayer=0;
   for(let i=0;i<S.nPlayers;i++){if((S.glory[i]||0)<minGlory){minGlory=S.glory[i]||0;minPlayer=i;}}
   S.current=minPlayer;
@@ -997,14 +1085,13 @@ function showWinner(){
   showScreen('winner');
   let maxGlory=-1,winner=0;
   for(let i=0;i<S.nPlayers;i++){if((S.glory[i]||0)>maxGlory){maxGlory=S.glory[i]||0;winner=i;}}
-  document.getElementById('winnerName').textContent=`${S.players[winner]} venceu com ${maxGlory} pontos de Glória!`;
-  const fs=document.getElementById('finalScores');
-  fs.innerHTML='';
+  const botWon=S.isBot[winner];
+  document.getElementById('winnerName').textContent=`${botWon?'🤖 ':''}${S.players[winner]} venceu com ${maxGlory} pontos!`;
+  const fs=document.getElementById('finalScores');fs.innerHTML='';
   const sorted=[...Array(S.nPlayers).keys()].sort((a,b)=>(S.glory[b]||0)-(S.glory[a]||0));
   for(const i of sorted){
-    const row=document.createElement('div');
-    row.className='final-score-row'+(i===winner?' winner-row':'');
-    row.innerHTML=`<span class="fs-name ${playerColor(i)}">${S.players[i]}</span><span class="fs-score">${S.glory[i]||0} ✦</span>`;
+    const row=document.createElement('div');row.className='final-score-row'+(i===winner?' winner-row':'');
+    row.innerHTML=`<span class="fs-name ${playerColor(i)}">${S.isBot[i]?'🤖 ':''}${S.players[i]}</span><span class="fs-score">${S.glory[i]||0} ✦</span>`;
     fs.appendChild(row);
   }
 }
@@ -1016,9 +1103,7 @@ function showWinner(){
 function makeCardEl(card,interactive=true){
   const el=document.createElement('div');
   el.className='poke-card'+(interactive&&S.selectedIds.has(card.uid)?' selected':'');
-  el.dataset.region=card.region;
-  el.dataset.uid=card.uid;
-
+  el.dataset.region=card.region;el.dataset.uid=card.uid;
   el.innerHTML=`
     <div class="card-top">
       <div class="card-type-emoji">${card.typeEmoji}</div>
@@ -1031,9 +1116,9 @@ function makeCardEl(card,interactive=true){
     <div class="card-info">${card.typeEmoji} ${card.type} · ${card.regionEmoji} ${card.region}</div>
     <div class="card-power">${card.controlValue}</div>
   `;
-
   if(interactive){
     el.addEventListener('click',()=>{
+      if(isCurrentBot())return; // block interaction during bot turn
       if(S.selectedIds.has(card.uid))S.selectedIds.delete(card.uid);
       else S.selectedIds.add(card.uid);
       renderAll();
@@ -1042,384 +1127,145 @@ function makeCardEl(card,interactive=true){
   return el;
 }
 
-// ── SVG MAP DATA ──
-// Each region: path (irregular polygon), label anchor, token anchor, marker anchor
 const REGION_MAP = {
-  "Planície": {
-    path: "M10,10 L320,10 L340,80 L310,160 L260,200 L180,210 L80,190 L10,160 Z",
-    fill: "#52c47a",
-    labelX: 165, labelY: 105,
-    tokenX: 30,  tokenY: 30,
-    markerX: 120, markerY: 140,
-    emoji: "🌿",
-  },
-  "Oceano": {
-    path: "M340,80 L320,10 L560,10 L580,10 L600,90 L580,180 L500,220 L400,230 L310,160 Z",
-    fill: "#4db8d4",
-    labelX: 460, labelY: 110,
-    tokenX: 390, tokenY: 28,
-    markerX: 450, markerY: 160,
-    emoji: "💧",
-  },
-  "Vulcão": {
-    path: "M580,10 L810,10 L810,200 L700,220 L600,200 L580,180 L600,90 Z",
-    fill: "#d94f5c",
-    labelX: 695, labelY: 100,
-    tokenX: 720, tokenY: 28,
-    markerX: 700, markerY: 155,
-    emoji: "🔥",
-  },
-  "Sombra": {
-    path: "M10,160 L80,190 L180,210 L260,200 L310,160 L400,230 L380,300 L290,340 L160,360 L60,330 L10,290 Z",
-    fill: "#9b6fd4",
-    labelX: 185, labelY: 278,
-    tokenX: 18,  tokenY: 195,
-    markerX: 185, markerY: 320,
-    emoji: "🌑",
-  },
-  "Tempestade": {
-    path: "M310,160 L400,230 L500,220 L580,180 L700,220 L720,310 L620,360 L500,370 L380,300 Z",
-    fill: "#f5c842",
-    labelX: 530, labelY: 285,
-    tokenX: 380, tokenY: 232,
-    markerX: 535, markerY: 340,
-    emoji: "⚡",
-  },
-  "Caverna": {
-    path: "M700,220 L810,200 L810,430 L620,430 L500,430 L500,370 L620,360 L720,310 Z",
-    fill: "#9aabb5",
-    labelX: 670, labelY: 340,
-    tokenX: 730, tokenY: 240,
-    markerX: 660, markerY: 400,
-    emoji: "🪨",
-  },
+  "Planície":{path:"M10,10 L320,10 L340,80 L310,160 L260,200 L180,210 L80,190 L10,160 Z",fill:"#52c47a",labelX:165,labelY:105,tokenX:30,tokenY:30,markerX:120,markerY:140,emoji:"🌿"},
+  "Oceano":{path:"M340,80 L320,10 L560,10 L580,10 L600,90 L580,180 L500,220 L400,230 L310,160 Z",fill:"#4db8d4",labelX:460,labelY:110,tokenX:390,tokenY:28,markerX:450,markerY:160,emoji:"💧"},
+  "Vulcão":{path:"M580,10 L810,10 L810,200 L700,220 L600,200 L580,180 L600,90 Z",fill:"#d94f5c",labelX:695,labelY:100,tokenX:720,tokenY:28,markerX:700,markerY:155,emoji:"🔥"},
+  "Sombra":{path:"M10,160 L80,190 L180,210 L260,200 L310,160 L400,230 L380,300 L290,340 L160,360 L60,330 L10,290 Z",fill:"#9b6fd4",labelX:185,labelY:278,tokenX:18,tokenY:195,markerX:185,markerY:320,emoji:"🌑"},
+  "Tempestade":{path:"M310,160 L400,230 L500,220 L580,180 L700,220 L720,310 L620,360 L500,370 L380,300 Z",fill:"#f5c842",labelX:530,labelY:285,tokenX:380,tokenY:232,markerX:535,markerY:340,emoji:"⚡"},
+  "Caverna":{path:"M700,220 L810,200 L810,430 L620,430 L500,430 L500,370 L620,360 L720,310 Z",fill:"#9aabb5",labelX:670,labelY:340,tokenX:730,tokenY:240,markerX:660,markerY:400,emoji:"🪨"},
 };
-
-const PLAYER_COLORS_HEX = ["#f5c842","#4db8d4","#d94f5c","#52c47a"];
+const PLAYER_COLORS_HEX=["#f5c842","#4db8d4","#d94f5c","#52c47a"];
 
 function renderBoard(){
-  const svg = document.getElementById('boardSvg');
-  if(!svg) return;
-
-  const W=820, H=440;
-  const ns='http://www.w3.org/2000/svg';
-
-  function el(tag,attrs,text){
-    const e=document.createElementNS(ns,tag);
-    for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);
-    if(text!==undefined)e.textContent=text;
-    return e;
-  }
-
+  const svg=document.getElementById('boardSvg');if(!svg)return;
+  const W=820,H=440,ns='http://www.w3.org/2000/svg';
+  function el(tag,attrs,text){const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);if(text!==undefined)e.textContent=text;return e;}
   svg.innerHTML='';
-
-  // ── DEFS: filters & patterns ──
   const defs=el('defs',{});
-
-  // Parchment texture noise
-  const filt=el('filter',{id:'parchment',x:'0%',y:'0%',width:'100%',height:'100%'});
-  const feTurb=el('feTurbulence',{type:'fractalNoise',baseFrequency:'0.65',numOctaves:'3',stitchTiles:'stitch'});
-  const feBlend=el('feBlend',{in:'SourceGraphic',in2:'noise',mode:'multiply'});
-  filt.appendChild(feTurb); filt.appendChild(feBlend);
-
-  // Glow for leader region
-  const glow=el('filter',{id:'glow'});
-  const feGaussian=el('feGaussianBlur',{stdDeviation:'3',result:'coloredBlur'});
-  const feMerge=el('feMerge',{});
-  const feMergeNode1=el('feMergeNode',{in:'coloredBlur'});
-  const feMergeNode2=el('feMergeNode',{in:'SourceGraphic'});
-  feMerge.appendChild(feMergeNode1); feMerge.appendChild(feMergeNode2);
-  glow.appendChild(feGaussian); glow.appendChild(feMerge);
-
-  // Drop shadow
-  const shadow=el('filter',{id:'shadow'});
-  const feShadow=el('feDropShadow',{dx:'0',dy:'2',stdDeviation:'3','flood-color':'#00000066'});
-  shadow.appendChild(feShadow);
-
-  defs.appendChild(filt); defs.appendChild(glow); defs.appendChild(shadow);
-  svg.appendChild(defs);
-
-  // ── BACKGROUND ──
-  const bg=el('rect',{x:0,y:0,width:W,height:H,fill:'#0a0918'});
-  svg.appendChild(bg);
-
-  // Subtle grid texture
-  const gridPat=el('pattern',{id:'grid',width:'40',height:'40',patternUnits:'userSpaceOnUse'});
-  const gridLine1=el('path',{d:'M 40 0 L 0 0 0 40',fill:'none',stroke:'#ffffff06',
-    'stroke-width':'0.5'});
-  gridPat.appendChild(gridLine1);
-  defs.appendChild(gridPat);
-  const gridRect=el('rect',{x:0,y:0,width:W,height:H,fill:'url(#grid)'});
-  svg.appendChild(gridRect);
-
-  // ── RENDER EACH REGION ──
-  for(const [regionId, rd] of Object.entries(REGION_MAP)){
-    const ctrl = S.started ? (S.control[regionId]||{}) : {};
-    const tokens = S.started ? (S.gloryTokens[regionId]||[0,0,0]) : [0,0,0];
-    const {winners} = S.started ? regionController(regionId) : {winners:[]};
-    const isLeader = winners.length===1;
-
+  const glow=el('filter',{id:'glow'});glow.appendChild(el('feGaussianBlur',{stdDeviation:'3',result:'coloredBlur'}));const fm=el('feMerge',{});fm.appendChild(el('feMergeNode',{in:'coloredBlur'}));fm.appendChild(el('feMergeNode',{in:'SourceGraphic'}));glow.appendChild(fm);
+  const shadow=el('filter',{id:'shadow'});shadow.appendChild(el('feDropShadow',{dx:'0',dy:'2',stdDeviation:'3','flood-color':'#00000066'}));
+  const gridPat=el('pattern',{id:'grid',width:'40',height:'40',patternUnits:'userSpaceOnUse'});gridPat.appendChild(el('path',{d:'M 40 0 L 0 0 0 40',fill:'none',stroke:'#ffffff06','stroke-width':'0.5'}));
+  defs.appendChild(glow);defs.appendChild(shadow);defs.appendChild(gridPat);svg.appendChild(defs);
+  svg.appendChild(el('rect',{x:0,y:0,width:W,height:H,fill:'#0a0918'}));
+  svg.appendChild(el('rect',{x:0,y:0,width:W,height:H,fill:'url(#grid)'}));
+  for(const[regionId,rd]of Object.entries(REGION_MAP)){
+    const ctrl=S.started?(S.control[regionId]||{}):{};
+    const tokens=S.started?(S.gloryTokens[regionId]||[0,0,0]):[0,0,0];
+    const{winners}=S.started?regionController(regionId):{winners:[]};
+    const isLeader=winners.length===1;
     const g=el('g',{});
-
-    // Region fill
-    const regionPath=el('path',{
-      d: rd.path,
-      fill: rd.fill+'28',
-      stroke: rd.fill,
-      'stroke-width': isLeader?'2.5':'1.5',
-      'stroke-linejoin':'round',
-      filter: isLeader?'url(#glow)':'',
-    });
-    g.appendChild(regionPath);
-
-    // Subtle texture overlay
-    const texOverlay=el('path',{
-      d: rd.path,
-      fill: rd.fill+'0a',
-      stroke:'none',
-    });
-    g.appendChild(texOverlay);
-
-    // Region label (name + emoji)
+    g.appendChild(el('path',{d:rd.path,fill:rd.fill+'28',stroke:rd.fill,'stroke-width':isLeader?'2.5':'1.5','stroke-linejoin':'round',filter:isLeader?'url(#glow)':''}));
     const labelG=el('g',{'text-anchor':'middle'});
-    const emojiT=el('text',{
-      x:rd.labelX, y:rd.labelY-10,
-      'font-size':'22','text-anchor':'middle',
-      style:'dominant-baseline:auto',
-    }, rd.emoji);
-    const nameT=el('text',{
-      x:rd.labelX, y:rd.labelY+12,
-      fill:rd.fill,
-      'font-family':'Cinzel,serif',
-      'font-size':'11',
-      'font-weight':'700',
-      'text-anchor':'middle',
-      'letter-spacing':'1',
-    }, regionId.toUpperCase());
-    labelG.appendChild(emojiT);
-    labelG.appendChild(nameT);
+    labelG.appendChild(el('text',{x:rd.labelX,y:rd.labelY-10,'font-size':'22','text-anchor':'middle',style:'dominant-baseline:auto'},rd.emoji));
+    labelG.appendChild(el('text',{x:rd.labelX,y:rd.labelY+12,fill:rd.fill,'font-family':'Cinzel,serif','font-size':'11','font-weight':'700','text-anchor':'middle','letter-spacing':'1'},regionId.toUpperCase()));
     g.appendChild(labelG);
-
-    // ── GLORY TOKENS — 3 small circles near tokenX/Y ──
     if(S.started){
       const eraLabels=['I','II','III'];
       for(let i=0;i<3;i++){
-        const tx=rd.tokenX + i*26;
-        const ty=rd.tokenY;
-        const scored=S.era>i+1;
-        const circle=el('circle',{
-          cx:tx, cy:ty, r:'11',
-          fill: scored?'#ffffff08':'#13122688',
-          stroke: scored?'#ffffff18':rd.fill+'99',
-          'stroke-width':'1.5',
-        });
-        const valT=el('text',{
-          x:tx, y:ty+1,
-          fill: scored?'#ffffff33':rd.fill,
-          'font-family':'Cinzel,serif',
-          'font-size':'9',
-          'font-weight':'700',
-          'text-anchor':'middle',
-          'dominant-baseline':'middle',
-        }, String(tokens[i]||0));
-        const eraT=el('text',{
-          x:tx, y:ty+14,
-          fill:'#ffffff44',
-          'font-family':'Cinzel,serif',
-          'font-size':'7',
-          'text-anchor':'middle',
-          'dominant-baseline':'middle',
-        }, eraLabels[i]);
-        g.appendChild(circle);
-        g.appendChild(valT);
-        g.appendChild(eraT);
+        const tx=rd.tokenX+i*26,ty=rd.tokenY,scored=S.era>i+1;
+        g.appendChild(el('circle',{cx:tx,cy:ty,r:'11',fill:scored?'#ffffff08':'#13122688',stroke:scored?'#ffffff18':rd.fill+'99','stroke-width':'1.5'}));
+        g.appendChild(el('text',{x:tx,y:ty+1,fill:scored?'#ffffff33':rd.fill,'font-family':'Cinzel,serif','font-size':'9','font-weight':'700','text-anchor':'middle','dominant-baseline':'middle'},String(tokens[i]||0)));
+        g.appendChild(el('text',{x:tx,y:ty+14,fill:'#ffffff44','font-family':'Cinzel,serif','font-size':'7','text-anchor':'middle','dominant-baseline':'middle'},eraLabels[i]));
       }
     }
-
-    // ── CONTROL MARKERS ──
     if(S.started){
-      const entries=Object.entries(ctrl)
-        .map(([pi,cnt])=>({pi:Number(pi),cnt:Number(cnt)}))
-        .filter(e=>e.cnt>0)
-        .sort((a,b)=>b.cnt-a.cnt);
-
-      const mStartX=rd.markerX;
-      const mStartY=rd.markerY;
+      const entries=Object.entries(ctrl).map(([pi,cnt])=>({pi:Number(pi),cnt:Number(cnt)})).filter(e=>e.cnt>0).sort((a,b)=>b.cnt-a.cnt);
       const cols=2;
       entries.forEach(({pi,cnt},idx)=>{
-        const col=idx%cols;
-        const row=Math.floor(idx/cols);
-        const mx=mStartX + col*52 - (Math.min(entries.length,cols)-1)*26;
-        const my=mStartY + row*22;
+        const col=idx%cols,row=Math.floor(idx/cols);
+        const mx=rd.markerX+col*52-(Math.min(entries.length,cols)-1)*26;
+        const my=rd.markerY+row*22;
         const pcolor=PLAYER_COLORS_HEX[pi%4];
-
-        // Marker pill background
-        const pillW=46, pillH=17;
-        const pill=el('rect',{
-          x:mx-pillW/2, y:my-pillH/2,
-          width:pillW, height:pillH,
-          rx:'8', ry:'8',
-          fill:pcolor+'33',
-          stroke:pcolor+'99',
-          'stroke-width':'1',
-          filter:'url(#shadow)',
-        });
-        // Player name (truncated)
-        const pname=S.players[pi].slice(0,5);
-        const pnameT=el('text',{
-          x:mx-8, y:my+1,
-          fill:pcolor,
-          'font-family':'Cinzel,serif',
-          'font-size':'7',
-          'font-weight':'700',
-          'dominant-baseline':'middle',
-        }, pname);
-        // Count badge
-        const countCircle=el('circle',{
-          cx:mx+pillW/2-9, cy:my, r:'7',
-          fill:pcolor,
-        });
-        const countT=el('text',{
-          x:mx+pillW/2-9, y:my+1,
-          fill:'#000000cc',
-          'font-family':'Cinzel,serif',
-          'font-size':'8',
-          'font-weight':'900',
-          'text-anchor':'middle',
-          'dominant-baseline':'middle',
-        }, String(cnt));
-
-        g.appendChild(pill);
-        g.appendChild(pnameT);
-        g.appendChild(countCircle);
-        g.appendChild(countT);
+        const pillW=46,pillH=17;
+        g.appendChild(el('rect',{x:mx-pillW/2,y:my-pillH/2,width:pillW,height:pillH,rx:'8',ry:'8',fill:pcolor+'33',stroke:pcolor+'99','stroke-width':'1',filter:'url(#shadow)'}));
+        // Bot indicator on pill
+        const pname=(S.isBot&&S.isBot[pi]?'🤖':'')+S.players[pi].slice(0,5);
+        g.appendChild(el('text',{x:mx-8,y:my+1,fill:pcolor,'font-family':'Cinzel,serif','font-size':'7','font-weight':'700','dominant-baseline':'middle'},pname));
+        g.appendChild(el('circle',{cx:mx+pillW/2-9,cy:my,r:'7',fill:pcolor}));
+        g.appendChild(el('text',{x:mx+pillW/2-9,y:my+1,fill:'#000000cc','font-family':'Cinzel,serif','font-size':'8','font-weight':'900','text-anchor':'middle','dominant-baseline':'middle'},String(cnt)));
+        g.appendChild(g.lastChild);
       });
     }
-
     svg.appendChild(g);
   }
-
-  // ── BORDER LINES between regions (decorative) ──
-  // already done by stroked paths — add a subtle outer border
-  const outerBorder=el('rect',{
-    x:2,y:2,width:W-4,height:H-4,
-    fill:'none',
-    stroke:'#ffffff12',
-    'stroke-width':'1',
-    rx:'4',
-  });
-  svg.appendChild(outerBorder);
-
-  // ── COMPASS ROSE (decorative, bottom-right corner) ──
-  const cx=790, cy=420;
-  const compassG=el('g',{'opacity':'0.3'});
-  [0,90,180,270].forEach((angle)=>{
-    const rad=angle*Math.PI/180;
-    const x2=cx+Math.sin(rad)*12;
-    const y2=cy-Math.cos(rad)*12;
-    compassG.appendChild(el('line',{x1:cx,y1:cy,x2,y2,stroke:'#c9a84c','stroke-width':'1.5'}));
-  });
-  compassG.appendChild(el('circle',{cx,cy,r:'3',fill:'#c9a84c'}));
-  compassG.appendChild(el('text',{x:cx,y:cy-18,fill:'#c9a84c','font-size':'8','text-anchor':'middle','font-family':'Cinzel,serif'},'N'));
-  svg.appendChild(compassG);
+  svg.appendChild(el('rect',{x:2,y:2,width:W-4,height:H-4,fill:'none',stroke:'#ffffff12','stroke-width':'1',rx:'4'}));
+  const cx=790,cy=420,cg=el('g',{opacity:'0.3'});
+  [0,90,180,270].forEach(a=>{const r=a*Math.PI/180;cg.appendChild(el('line',{x1:cx,y1:cy,x2:cx+Math.sin(r)*12,y2:cy-Math.cos(r)*12,stroke:'#c9a84c','stroke-width':'1.5'}));});
+  cg.appendChild(el('circle',{cx,cy,r:'3',fill:'#c9a84c'}));
+  cg.appendChild(el('text',{x:cx,y:cy-18,fill:'#c9a84c','font-size':'8','text-anchor':'middle','font-family':'Cinzel,serif'},'N'));
+  svg.appendChild(cg);
 }
 
 function renderMarket(){
   const cont=document.getElementById('marketCards');
-  const count=document.getElementById('marketCount');
-  count.textContent=`${S.market.length} cartas`;
+  document.getElementById('marketCount').textContent=`${S.market.length} cartas`;
   cont.innerHTML='';
-  if(!S.market.length){
-    cont.innerHTML='<div class="empty-state">Mercado vazio.</div>';
-    return;
-  }
+  if(!S.market.length){cont.innerHTML='<div class="empty-state">Mercado vazio.</div>';return;}
   for(const c of S.market){
     const el=makeCardEl(c,false);
-    el.style.cursor='pointer';
-    el.title='Clique para recrutar esta carta';
-    el.addEventListener('click',()=>{drawFromMarket(c.uid);renderAll();});
+    el.style.cursor=isCurrentBot()?'not-allowed':'pointer';
+    el.title='Clique para recrutar';
+    if(!isCurrentBot())el.addEventListener('click',()=>{drawFromMarket(c.uid);renderAll();});
     cont.appendChild(el);
   }
 }
 
 function renderHand(){
-  const pi=S.current;
-  const hand=S.hands[pi];
+  const pi=S.current,hand=S.hands[pi];
   const cont=document.getElementById('handCards');
-  const handTitle=document.getElementById('handTitle');
-  const handCount=document.getElementById('handCount');
-  handTitle.textContent=`Mão de ${S.players[pi]}`;
-  handCount.textContent=`${hand.length}/10 cartas`;
+  document.getElementById('handTitle').textContent=`Mão de ${S.isBot[pi]?'🤖 ':''}${S.players[pi]}`;
+  document.getElementById('handCount').textContent=`${hand.length}/10 cartas`;
   cont.innerHTML='';
-  if(!hand.length){cont.innerHTML='<div class="empty-state">Nenhuma carta na mão.</div>';return;}
-  for(const c of hand){
-    cont.appendChild(makeCardEl(c,true));
-  }
+  if(!hand.length){cont.innerHTML='<div class="empty-state">Nenhuma carta.</div>';return;}
+  for(const c of hand)cont.appendChild(makeCardEl(c,!isCurrentBot()));
 }
 
 function renderBands(){
-  const cont=document.getElementById('bandsPlayed');
-  cont.innerHTML='';
+  const cont=document.getElementById('bandsPlayed');cont.innerHTML='';
   const eraBands=S.bands.filter(b=>b.era===S.era);
   if(!eraBands.length){cont.innerHTML='<div class="empty-state">Nenhum bando esta era.</div>';return;}
   for(const b of eraBands){
     const leader=b.cards[b.leaderIdx];
-    const row=document.createElement('div');
-    row.className='band-row';
-    row.innerHTML=`
-      <div>
-        <div style="font-size:11px;font-weight:600" class="${playerColor(b.playerIdx)}">${S.players[b.playerIdx]}</div>
-        <div class="band-leader-badge">Líder: ${leader.typeEmoji} ${leader.pokemonName}</div>
-        <div class="band-info">${b.cards.length} carta(s) · ${gloryForBand(b.cards.length)} glória · ${leader.regionEmoji} ${leader.region}</div>
-      </div>
-    `;
+    const row=document.createElement('div');row.className='band-row';
+    const botIcon=S.isBot[b.playerIdx]?'🤖 ':'';
+    row.innerHTML=`<div><div style="font-size:11px;font-weight:600" class="${playerColor(b.playerIdx)}">${botIcon}${S.players[b.playerIdx]}</div><div class="band-leader-badge">Líder: ${leader.typeEmoji} ${leader.pokemonName}</div><div class="band-info">${b.cards.length} carta(s) · ${gloryForBand(b.cards.length)} glória · ${leader.regionEmoji} ${leader.region}</div></div>`;
     cont.appendChild(row);
   }
 }
 
 function renderScores(){
-  const list=document.getElementById('scoreList');
-  list.innerHTML='';
+  const list=document.getElementById('scoreList');list.innerHTML='';
   const sorted=[...Array(S.nPlayers).keys()].sort((a,b)=>(S.glory[b]||0)-(S.glory[a]||0));
   for(const i of sorted){
     const row=document.createElement('div');
     row.className='player-score-row'+(i===S.current?' current-player':'');
-    row.innerHTML=`
-      <div style="display:flex;align-items:center;gap:7px">
-        <div class="player-dot dot-${playerColor(i)}"></div>
-        <div class="pname">${S.players[i]}</div>
-      </div>
-      <div class="pscore">${S.glory[i]||0} ✦</div>
-    `;
+    const botBadge=S.isBot[i]?'<span class="bot-badge'+(i===S.current?' bot-thinking':'')+'">🤖 Bot</span> ':'';
+    row.innerHTML=`<div style="display:flex;align-items:center;gap:7px"><div class="player-dot dot-${playerColor(i)}"></div><div class="pname">${botBadge}${S.players[i]}</div></div><div class="pscore">${S.glory[i]||0} ✦</div>`;
     list.appendChild(row);
   }
 }
 
 function renderEraIndicator(){
-  const cont=document.getElementById('eraIndicator');
-  cont.innerHTML='';
+  const cont=document.getElementById('eraIndicator');cont.innerHTML='';
   for(let e=1;e<=S.maxEra;e++){
-    const d=document.createElement('div');
-    d.className='era-dot'+(e<S.era?' done':e===S.era?' active':'');
-    d.textContent=`${e}`;
-    cont.appendChild(d);
+    const d=document.createElement('div');d.className='era-dot'+(e<S.era?' done':e===S.era?' active':'');d.textContent=`${e}`;cont.appendChild(d);
   }
   document.getElementById('deckCount').textContent=`Deck: ${S.deck.length} cartas`;
 }
 
 function renderActionBar(){
-  document.getElementById('turnBadge').textContent=`${S.players[S.current]}`;
-  document.getElementById('actionHint').textContent=`Era ${S.era}/${S.maxEra} · Recrute ou Jogue um Bando`;
-
-  const sel=getSelected();
-  const v=validateBand(sel);
+  const isBot=isCurrentBot();
+  document.getElementById('turnBadge').textContent=`${isBot?'🤖 ':''}${S.players[S.current]}`;
+  document.getElementById('actionHint').textContent=isBot?`Bot pensando...`:`Era ${S.era}/${S.maxEra} · Recrute ou Jogue um Bando`;
+  const sel=getSelected();const v=validateBand(sel);
   const vEl=document.getElementById('bandValidation');
-  if(sel.length===0){vEl.innerHTML='';}
-  else if(v.ok){vEl.innerHTML=`<span class="val-ok">✓ ${v.mode==='type'?'Mesmo Tipo':'Mesma Região'} (${sel.length} cartas · ${gloryForBand(sel.length)} glória)</span>`;}
-  else{vEl.innerHTML=`<span class="val-err">✗ ${v.why}</span>`;}
-
-  document.getElementById('playBandBtn').disabled=!v.ok;
-  document.getElementById('drawDeckBtn').disabled=S.deck.length===0||S.hands[S.current].length>=10;
+  if(sel.length===0)vEl.innerHTML='';
+  else if(v.ok)vEl.innerHTML=`<span class="val-ok">✓ ${v.mode==='type'?'Mesmo Tipo':'Mesma Região'} (${sel.length} cartas · ${gloryForBand(sel.length)} glória)</span>`;
+  else vEl.innerHTML=`<span class="val-err">✗ ${v.why}</span>`;
+  document.getElementById('playBandBtn').disabled=!v.ok||isBot;
+  document.getElementById('drawDeckBtn').disabled=S.deck.length===0||S.hands[S.current].length>=10||isBot;
+  document.getElementById('endTurnBtn').disabled=isBot;
 }
 
 function renderLog(){
@@ -1429,28 +1275,17 @@ function renderLog(){
 
 function renderAll(){
   if(!S.started)return;
-  renderEraIndicator();
-  renderScores();
-  renderBoard();
-  renderMarket();
-  renderHand();
-  renderBands();
-  renderActionBar();
-  renderLog();
+  renderEraIndicator();renderScores();renderBoard();renderMarket();renderHand();renderBands();renderActionBar();renderLog();
 }
 
 // ═══════════════════════════════════════════════════════
-// SCREEN MANAGEMENT
+// SCREEN & SETUP
 // ═══════════════════════════════════════════════════════
 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(`screen-${id}`).classList.add('active');
 }
-
-// ═══════════════════════════════════════════════════════
-// SETUP UI
-// ═══════════════════════════════════════════════════════
 
 function renderNameInputs(){
   const n=Number(document.getElementById('playerCountSel').value);
@@ -1460,8 +1295,27 @@ function renderNameInputs(){
   for(let i=0;i<n;i++){
     const wrap=document.createElement('div');
     wrap.className='form-group';
-    wrap.innerHTML=`<label>${COLORS[i]} Jogador ${i+1}</label><input id="pname-${i}" value="Jogador ${i+1}"/>`;
+    const defaultBot = i > 0; // default: only player 1 is human
+    wrap.innerHTML=`
+      <label>${COLORS[i]} Jogador ${i+1}</label>
+      <div class="player-row">
+        <input id="pname-${i}" value="${i===0?'Jogador 1':'Bot '+(i+1)}" ${defaultBot?'disabled':''}/>
+        <label class="bot-toggle ${defaultBot?'is-bot':''}" id="btlabel-${i}">
+          <input type="checkbox" id="pbot-${i}" ${defaultBot?'checked':''}/>
+          🤖 Bot
+        </label>
+      </div>
+    `;
     cont.appendChild(wrap);
+  }
+  // Wire bot toggles
+  for(let i=0;i<n;i++){
+    document.getElementById(`pbot-${i}`).addEventListener('change',function(){
+      const label=document.getElementById(`btlabel-${i}`);
+      const inp=document.getElementById(`pname-${i}`);
+      if(this.checked){label.classList.add('is-bot');inp.disabled=true;inp.value=`Bot ${i+1}`;}
+      else{label.classList.remove('is-bot');inp.disabled=false;inp.value=`Jogador ${i+1}`;}
+    });
   }
 }
 
@@ -1475,16 +1329,12 @@ document.getElementById('drawDeckBtn').addEventListener('click',()=>{playerDrawD
 document.getElementById('playBandBtn').addEventListener('click',()=>{playBand();});
 document.getElementById('endTurnBtn').addEventListener('click',()=>{endTurn();});
 document.getElementById('resetBtn').addEventListener('click',()=>{
-  S.started=false;
-  S.dragons=0;
+  S.started=false;S.botActive=false;S.dragons=0;hideBotOverlay();
   for(let i=0;i<3;i++)document.getElementById(`dp${i}`)?.classList.remove('revealed');
-  showScreen('setup');
-  renderNameInputs();
+  showScreen('setup');renderNameInputs();
 });
 document.getElementById('playAgainBtn').addEventListener('click',()=>{
-  S.started=false;
-  showScreen('setup');
-  renderNameInputs();
+  S.started=false;S.botActive=false;hideBotOverlay();showScreen('setup');renderNameInputs();
 });
 
 // Init
